@@ -1,0 +1,632 @@
+package com.renpin.renpincustomer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import com.renpin.location.MyLocation;
+import com.renpin.location.MySearch;
+import com.renpin.renpincustomer.AboutDialog.PriorityListener;
+import com.renpin.service.GoodService;
+import com.renpin.service.Impl.GoodServiceImpl;
+import com.renpin.utils.CommonUtils;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class TaskAnnounceActivity extends Activity {
+	// 返回键
+	ImageView imageview1;
+	// 添加图片的图标
+	ImageView imageview2;
+	// 要添加的第一个图片控件(下面依次类推)
+	ImageView imageview3;
+	ImageView imageview4;
+	ImageView imageview5;
+	ImageView imageview6;
+	ImageView imageview7;
+	ImageView imageview8;
+	// 第一张放大图片数据(下面依次类推)
+	String strIcon1 = "";
+	String strIcon2 = "";
+	String strIcon3 = "";
+	String strIcon4 = "";
+	String strIcon5 = "";
+	String strIcon6 = "";
+	// 第一张缩小图片数据(下面依次类推)
+	String strIcon7 = "";
+	String strIcon8 = "";
+	String strIcon9 = "";
+	String strIcon10 = "";
+	String strIcon11 = "";
+	String strIcon12 = "";
+	// 任务标题
+	EditText edittext1;
+	// 任务区域名称
+	EditText edittext2;
+	// 任务有效时间
+	TextView textview3;
+	// 任务详细描述
+	EditText edittext3;
+	// 任务发布按钮
+	Button button1;
+	// 用来获取服务器上数据的对象
+	private GoodService goodService = new GoodServiceImpl();
+	private MySearch mMySearch = null;// 用来对经纬度与地址之间的转换
+	private static CommonUtils mUtils = null;
+	private String mBase64Icon;
+	// 用来存储用户信息
+	SharedPreferences msettings = null;
+	// 当前用户名称
+	String mCurrentPersonName;
+	// 当前用户昵称
+	String mCurrentPersonNameTemp;
+	MyHandler myhandler;
+	// 设置的时间(秒)
+	int mnSeconds = 24 * 3600;
+	// 互助单选按钮
+	RadioButton radio1;
+	// 分享单选按钮
+	RadioButton radio2;
+	// 任务当前类型,1表示求助类型,2表示分享类型
+	int mTaskCurrentType = 1;
+	// 保存所选图片的路径
+	private String mImgPaths = "";
+	public static final String[] addPhoto = new String[] { "现在拍摄", "从相册选择",
+			"取消" };
+	// 图片索引号
+	int mnImageIndex = 0;
+	// 能够发布的图片数量
+	int mnImageCount = 6;
+	// 进度条对象
+	public static ProgressDialog m_ProgressDialog = null;
+	// 缩小图片的宽度
+	private final int nImageWidth = 200;
+	// 缩小图片的高度
+	private final int nImageHeight = 180;
+	// 添加按钮
+	private ImageView addimageview;
+	// 发布任务时人品值下限
+	private int nCreditValue = 1;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		// 程序启动的时候避免光标处在editview中而弹出输入法窗口
+		getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+		setContentView(R.layout.makepublic);
+
+		mnImageIndex = 0;
+
+		if (null == mMySearch) {
+			mMySearch = new MySearch(this);
+		}
+		if (null == mUtils) {
+			mUtils = new CommonUtils(this);
+		}
+		myhandler = new MyHandler();
+
+		msettings = getSharedPreferences("MekeSharedPreferences", 0);
+		mCurrentPersonNameTemp = msettings.getString("PersonName", "");
+		// 控件初始化
+		InitActivities();
+	}
+
+	private void InitActivities() {
+		edittext1 = (EditText) findViewById(R.id.makepublic_EditText1);
+		edittext2 = (EditText) findViewById(R.id.makepublic_EditText2);
+		textview3 = (TextView) findViewById(R.id.makepublic_textview1);
+		edittext3 = (EditText) findViewById(R.id.makepublic_edittext3);
+		button1 = (Button) findViewById(R.id.makepublic_button1);
+		radio1 = (RadioButton) findViewById(R.id.hotel_order_radiobutton1);
+		radio2 = (RadioButton) findViewById(R.id.hotel_order_radiobutton2);
+		imageview1 = (ImageView) findViewById(R.id.customer_login_image1);
+		imageview2 = (ImageView) findViewById(R.id.makepublic_imageview7);
+		imageview3 = (ImageView) findViewById(R.id.makepublic_imageview1);
+		imageview4 = (ImageView) findViewById(R.id.makepublic_imageview2);
+		imageview5 = (ImageView) findViewById(R.id.makepublic_imageview3);
+		imageview6 = (ImageView) findViewById(R.id.makepublic_imageview4);
+		imageview7 = (ImageView) findViewById(R.id.makepublic_imageview5);
+		imageview8 = (ImageView) findViewById(R.id.makepublic_imageview6);
+		addimageview = (ImageView) findViewById(R.id.makepublic_addimageview);
+
+		imageview1.setOnClickListener(new ImageView.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+
+		});
+
+		imageview2.setOnClickListener(new ImageView.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				showDialog(0);
+			}
+
+		});
+
+		// 默认情况下让求助单选按钮被选上
+		radio1.setChecked(true);
+		radio2.setChecked(false);
+
+		String strText = "1天" + "0小时" + "0分";
+		textview3.setText(strText);
+
+		edittext2.setText(MyLocation.mStrAddress);
+
+		button1.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				String strTitleText = edittext1.getText().toString();
+
+				mCurrentPersonName = msettings.getString("TruePersonName", "");
+				String strAddress = edittext2.getText().toString();// 地址
+				String strCity = "上海";// 当前城市名称
+				if (mCurrentPersonName.equals("")) {
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"请先登录", Toast.LENGTH_LONG);
+					return;
+				}
+				if (strTitleText.equals("")) {
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"请输入任务标题", Toast.LENGTH_LONG);
+					edittext1.requestFocus();
+					return;
+				}
+				if (1 == mTaskCurrentType) {
+					m_ProgressDialog = ProgressDialog.show(
+							TaskAnnounceActivity.this, "提示", "正在发布任务,请等待...",
+							true);
+					m_ProgressDialog.setCancelable(true);
+				} else {
+					m_ProgressDialog = ProgressDialog.show(
+							TaskAnnounceActivity.this, "提示", "正在分享任务,请等待...",
+							true);
+					m_ProgressDialog.setCancelable(true);
+				}
+				if (mMySearch != null) {
+					strAddress = edittext2.getText().toString();
+
+					if (strAddress != null && strCity != null) {
+						mMySearch.GetLatiLong(strAddress, strCity);
+					}
+				}
+				button1.setText("正在发布...");
+				button1.setEnabled(false);
+				button1.setTextColor(Color.rgb(96, 96, 96));
+			}
+		});
+
+		textview3.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				AboutDialog aboutDialog = new AboutDialog(
+						TaskAnnounceActivity.this, 0, new PriorityListener() {
+
+							@Override
+							public void refreshPriorityUI(String str1,
+									String str2, String str3, String str4) {
+								String strText;
+								strText = str1 + "天" + str2 + "小时" + str3 + "分";
+								textview3.setText(strText);
+								mnSeconds = mUtils.GetSumSeconds(str1, str2,
+										str3, str4);
+							}
+
+						});
+				aboutDialog.show();
+			}
+
+		});
+
+		radio1.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				radio2.setChecked(false);
+				mTaskCurrentType = 1;
+			}
+
+		});
+
+		radio2.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				radio1.setChecked(false);
+				mTaskCurrentType = 2;
+			}
+
+		});
+
+		addimageview.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				AboutDialog aboutDialog = null;
+				aboutDialog = new AboutDialog(TaskAnnounceActivity.this, 3,
+						new PriorityListener() {
+
+							@Override
+							public void refreshPriorityUI(String str1,
+									String str2, String str3, String str4) {
+								nCreditValue = AboutDialog.GetCreditValue();
+							}
+
+						});
+				aboutDialog.show();
+			}
+
+		});
+	}
+
+	class MyHandler extends Handler {
+		// 子类必须重写此方法,接受数据
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			Bundle b = msg.getData();
+			int nRet = b.getInt("nRet");
+			int nRet1 = b.getInt("nRet1");
+			if (0 == msg.what) {
+				if (0 == nRet) {
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"发布任务失败", Toast.LENGTH_LONG);
+				} else {
+					// CommonUtils.ShowToastCenter(getApplicationContext(),
+					// "发布任务成功", Toast.LENGTH_LONG);
+				}
+				if (0 == nRet1) {
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"上传图片失败", Toast.LENGTH_LONG);
+				} else {
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"发布任务成功", Toast.LENGTH_LONG);
+				}
+			}
+			if (m_ProgressDialog != null) {
+				m_ProgressDialog.dismiss();
+				m_ProgressDialog = null;
+			}
+			button1.setText("发布");
+			button1.setEnabled(true);
+			button1.setTextColor(Color.rgb(255, 255, 255));
+			finish();
+		}
+	}
+
+	// 获取到指定地址的经纬度后调用这个函数
+	public void DealAddressPositionInfo(final double dLongitude,
+			final double dLatitude) {
+
+		if (0 == dLongitude && 0 == dLatitude) {
+			if (m_ProgressDialog != null) {
+				m_ProgressDialog.dismiss();
+				m_ProgressDialog = null;
+			}
+			button1.setText("发布");
+			button1.setEnabled(true);
+			button1.setTextColor(Color.rgb(255, 255, 255));
+			CommonUtils.ShowToastCenter(getApplicationContext(), "发布失败",
+					Toast.LENGTH_LONG);
+		} else {
+			// 开始赋值
+			final String str1 = edittext1.getText().toString();// 任务标题
+			final String str2 = edittext2.getText().toString();// 任务区域
+			final String str3 = edittext3.getText().toString();// 任务详细描述
+			String strPersonName = msettings.getString("TruePersonName", "");
+			if (strPersonName.equals("")) {
+				CommonUtils.ShowToastCenter(getApplicationContext(), "请先登录",
+						Toast.LENGTH_LONG);
+				button1.setText("发布");
+				button1.setEnabled(true);
+				button1.setTextColor(Color.rgb(255, 255, 255));
+				return;
+			}
+			String strBase64Image = msettings.getString("Base64Image", "");
+			if (!strBase64Image.equals("")) {
+				mBase64Icon = strBase64Image;
+			} else {
+				Resources res = getResources();
+				Bitmap bmp = BitmapFactory.decodeResource(res,
+						R.drawable.noperson);
+				mBase64Icon = mUtils.BitmapToBase64(bmp);
+			}
+			// 开始向服务器发送添加数据的请求
+			Runnable run1 = new Runnable() {
+				public void run() {
+
+					int nRet1 = 0;
+					/*
+					 * int nRet = goodService.AddTaskInfo(mTaskCurrentType,
+					 * str2, str1, str3, "", "", mCurrentPersonNameTemp, "",
+					 * mCurrentPersonName, "", dLongitude, dLatitude,
+					 * mBase64Icon, mnSeconds + "", strIcon7, strIcon8,
+					 * strIcon9, strIcon10, strIcon11, strIcon12);
+					 */
+					int nRet = goodService.AddTaskInfoForLimit(
+							mTaskCurrentType, str2, str1, str3, "", "",
+							mCurrentPersonNameTemp, "", mCurrentPersonName, "",
+							dLongitude, dLatitude, mBase64Icon, mnSeconds + "",
+							strIcon7, strIcon8, strIcon9, strIcon10, strIcon11,
+							strIcon12, nCreditValue, 0);
+
+					if (nRet > 0) {// 如果发布任务没有失败
+						nRet1 = goodService.UploadLargeImage(nRet + "",
+								mTaskCurrentType + "", strIcon1, strIcon2,
+								strIcon3, strIcon4, strIcon5, strIcon6);
+					}
+					Message msg = myhandler.obtainMessage();
+					Bundle b = new Bundle();// 存放数据
+					b.putInt("nRet", nRet);
+					b.putInt("nRet1", nRet1);
+					msg.setData(b);
+					msg.what = 0;
+					myhandler.sendMessage(msg);
+				}
+			};
+			Thread thread = new Thread(run1);
+			thread.start();
+		}
+	}
+
+	private void SaveLargeImage(Bitmap bmp) {
+		if (0 == mnImageIndex) {
+			strIcon1 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp));
+		} else if (1 == mnImageIndex) {
+			strIcon2 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp));
+		} else if (2 == mnImageIndex) {
+			strIcon3 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp));
+		} else if (3 == mnImageIndex) {
+			strIcon4 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp));
+		} else if (4 == mnImageIndex) {
+			strIcon5 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp));
+		} else if (5 == mnImageIndex) {
+			strIcon6 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp));
+		}
+	}
+
+	private void ShowSmallImageInImageView(Bitmap bmp) {// 将图片显示在指定的图片窗口中
+		if (0 == mnImageIndex) {
+			imageview3.setImageBitmap(bmp);
+			strIcon7 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp,
+					nImageWidth, nImageHeight));
+		} else if (1 == mnImageIndex) {
+			imageview4.setImageBitmap(bmp);
+			strIcon8 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp,
+					nImageWidth, nImageHeight));
+		} else if (2 == mnImageIndex) {
+			imageview5.setImageBitmap(bmp);
+			strIcon9 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp,
+					nImageWidth, nImageHeight));
+		} else if (3 == mnImageIndex) {
+			imageview6.setImageBitmap(bmp);
+			strIcon10 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp,
+					nImageWidth, nImageHeight));
+		} else if (4 == mnImageIndex) {
+			imageview7.setImageBitmap(bmp);
+			strIcon11 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp,
+					nImageWidth, nImageHeight));
+		} else if (5 == mnImageIndex) {
+			imageview8.setImageBitmap(bmp);
+			strIcon12 = mUtils.BitmapToBase64BySize(mUtils.zoomBitmap(bmp,
+					nImageWidth, nImageHeight));
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		Bitmap bitmap = null;
+
+		// if (resultCode == RESULT_OK)
+		{
+			if (requestCode == 0) {
+				String strImagePath = Environment.getExternalStorageDirectory()
+						+ "/" + "carPhoto" + "/" + "Car.jpg";
+				// 先判断该文件是否存在
+				File pImageFile = new File(strImagePath);
+				if (pImageFile.exists()) {
+					// 对图片进行旋转处理
+					mUtils.rotatePhoto(strImagePath);
+
+					File imgFile = new File(strImagePath);
+					try {
+						Uri imgUri = Uri
+								.parse(android.provider.MediaStore.Images.Media
+										.insertImage(getContentResolver(),
+												imgFile.getAbsolutePath(),
+												null, null));
+						String[] proj = { MediaStore.Images.Media.DATA };
+						@SuppressWarnings("deprecation")
+						Cursor cursor = managedQuery(imgUri, proj, null, null,
+								null);
+						int column_index = cursor
+								.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+						cursor.moveToFirst();
+						String path = cursor.getString(column_index);
+						mImgPaths = path;
+
+						ContentResolver cr = this.getContentResolver();
+						bitmap = BitmapFactory.decodeStream(cr
+								.openInputStream(imgUri));
+
+						if (mnImageIndex >= mnImageCount) {
+							mnImageIndex = 0;
+						}
+						// 将放大图片的base64保存
+						SaveLargeImage(bitmap/*
+											 * ThumbnailUtils.extractThumbnail(
+											 * bitmap, 500, 500)
+											 */);
+
+						// bitmap = ThumbnailUtils
+						// .extractThumbnail(bitmap, 500, 500);
+						// 将图片显示到图片控件中
+						ShowSmallImageInImageView(bitmap);
+
+						mnImageIndex++;
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (OutOfMemoryError e) {
+						CommonUtils.ShowToastCenter(this, "内存不足!",
+								Toast.LENGTH_LONG);
+					}
+				}
+			} else if (requestCode == 1) {
+				if (data == null) {
+					return;
+				}
+				try {
+					Uri uri = data.getData();
+					ContentResolver cr = this.getContentResolver();
+					String[] proj = { MediaStore.Images.Media.DATA };
+					@SuppressWarnings("deprecation")
+					Cursor cursor = managedQuery(uri, proj, null, null, null);
+					int column_index = cursor
+							.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+					cursor.moveToFirst();
+					String path = cursor.getString(column_index);
+					mImgPaths = path;
+					// 对图片进行旋转处理
+					bitmap = mUtils.PhotoRotation(uri);
+
+					if (mnImageIndex >= mnImageCount) {
+						mnImageIndex = 0;
+					}
+					// 将放大图片的base64保存
+					SaveLargeImage(bitmap/*
+										 * ThumbnailUtils.extractThumbnail(bitmap
+										 * , 500, 500)
+										 */);
+
+					// bitmap = ThumbnailUtils.extractThumbnail(bitmap, 500,
+					// 500);
+					// 将图片显示到图片控件中
+					ShowSmallImageInImageView(bitmap);
+
+					mnImageIndex++;
+				} catch (OutOfMemoryError e) {
+					CommonUtils.ShowToastCenter(this, "内存不足!",
+							Toast.LENGTH_LONG);
+				}
+			}
+		}
+	}
+
+	protected Dialog onCreateDialog(int id) {
+		AlertDialog dialog = null;
+		AlertDialog.Builder builder = null;
+		switch (id) {
+		case 0:
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("添加用户图片");
+			builder.setItems(addPhoto, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					if (which == 0) {
+						String haveSD = Environment.getExternalStorageState();
+						if (!haveSD.equals(Environment.MEDIA_MOUNTED)) {
+							Toast.makeText(TaskAnnounceActivity.this, "存储卡不可用",
+									Toast.LENGTH_LONG).show();
+							return;
+						}
+						File dir = new File(Environment
+								.getExternalStorageDirectory()
+								+ "/"
+								+ "carPhoto");
+						if (!dir.exists()) {
+							dir.mkdirs();
+						} else {// 如果已经存在了该文件夹
+							// 判断该文件夹中是否存在Car.jpg文件,如果存在则删除
+							String strPhotoPath = Environment
+									.getExternalStorageDirectory()
+									+ "/"
+									+ "carPhoto" + "/" + "Car.jpg";
+							File pPhotoFile = new File(strPhotoPath);
+							if (pPhotoFile.exists()) {
+								pPhotoFile.delete();
+							}
+						}
+						Intent intent = new Intent(
+								android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+						File imgFile = new File(dir, "Car.jpg");
+						Uri u = Uri.fromFile(imgFile);
+						intent.putExtra(MediaStore.Images.Media.ORIENTATION, 0);
+						intent.putExtra(MediaStore.EXTRA_OUTPUT, u);
+						startActivityForResult(intent, 0);
+					}
+					if (which == 1) {
+						Intent intent = new Intent(
+								"android.intent.action.GET_CONTENT");
+						intent.addCategory("android.intent.category.OPENABLE");
+						intent.setType("image/*");
+						TaskAnnounceActivity.this.startActivityForResult(
+								intent, 1);
+					}
+				}
+			});
+			dialog = builder.create();
+			break;
+
+		default:
+			break;
+		}
+		return dialog;
+	}
+
+	// 屏幕旋转
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+		} else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (m_ProgressDialog != null) {
+			m_ProgressDialog.dismiss();
+			m_ProgressDialog = null;
+		}
+		finish();
+	}
+}

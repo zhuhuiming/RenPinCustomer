@@ -1,0 +1,1633 @@
+package com.renpin.renpincustomer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.renpin.domin.CommentInfo;
+import com.renpin.domin.TaskIcon;
+import com.renpin.service.GoodService;
+import com.renpin.service.Impl.GoodServiceImpl;
+import com.renpin.utils.CommonUtils;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class ShareDynamicDetailActivity extends Activity {
+	// 任务id号
+	private String strTaskId;
+	// 发布者图标
+	ImageView imageview1;
+	// 发布者名称
+	TextView textview1;
+	// 任务发布时间
+	TextView textview2;
+	// 任务剩余时间
+	TextView textview4;
+	// 任务标题
+	TextView textview5;
+	TextView textview5_1;
+	// 任务详细信息
+	TextView textview6;
+	// 分享者给接收者的总结
+	// TextView textview8;
+	// 接收者给分享者的总结
+	TextView textview16;
+	// 分享者给接收者发送的图片
+	// ImageView imageview2;
+	// 接收者给分享者发送的图片
+	ImageView imageview10;
+	// 评论图标
+	ImageView imageview3;
+	// 返回图标
+	ImageView imageview4;
+	// 评论条数
+	TextView textview9;
+	// 任务类型
+	TextView textview18;
+	// 存储评论数据
+	private static List<CommentInfo> mCommentInfos = null;
+	// 用来存储从数据库中获取到的数据
+	List<HashMap<String, Object>> mListData = null;
+	// 计时的剩余时间(秒)
+	private static long mnRemainTime;
+	private static CommonUtils mUtils = null;
+	// 用来存储用户信息
+	SharedPreferences msettings = null;
+	// 判断是否继续倒计时
+	boolean mbIsContinue = true;
+	MyHandler myhandler = null;
+	// 定时更新时间的线程对象
+	private static Thread mthre = null;
+	// 用来获取服务器上数据的对象
+	private GoodService goodService = new GoodServiceImpl();
+	// 发送评论编辑框
+	EditText edittext1;
+	// 发送评论按钮
+	Button button5;
+	// 判断评论是否针对指定的人
+	boolean bIsTalkToPerson = false;
+
+	// 任务发布者名称
+	private String strAccountName1;
+	// 任务执行者名称
+	private String strImpleName2;
+	// 任务发布者评论状态
+	private int nAccountComment1;
+	// 任务执行者评论状态
+	private int nImpleComment1;
+
+	// 接收评论的人名称
+	private String strReceiveName;
+	// 显示红点控件
+	private ImageView imageview5;
+	// 判断任务执行到的位置
+	private int nTaskPosition = 1;
+	// 状态图片的索引
+	private int nStatusImageIndex = 0;
+	// 显示评论的LinearLayout
+	private LinearLayout linearlayout1 = null;
+	private LinearLayout linearlayout2 = null;
+
+	// 任务完成或分享图片控件
+	private ImageView imagetask1;
+	private ImageView imagetask2;
+	private ImageView imagetask3;
+	private ImageView imagetask4;
+	private ImageView imagetask5;
+	private ImageView imagetask6;
+
+	// 存放任务或分享中的放大图片
+	public static String[] strIcons = new String[6];
+	// 存放任务缩放图片
+	TaskIcon taskicon = null;
+	// 分享者发送给接收者的图片
+	static String strSharePersonToRecImage = "";
+	// 接收者发送给分享者的图片
+	static String strRecToSharePersonImage = "";
+
+	// 答谢按钮
+	private Button thanksbutton;
+	// 发送图片控件
+	private ImageView sendpictureimageview;
+	// 任务类型,1表示求助,2表示分享
+	// private int mnTaskType;
+	// 保存所选图片的路径
+	private String mImgPaths = "";
+	public static final String[] addPhoto = new String[] { "现在拍摄", "从相册选择",
+			"取消" };
+	// 存储评论中的大图片
+	public static HashMap<String, String> CommentMaps;
+	// 保存刚刚选择的评论压缩图片
+	private String strCommentSmallImage;
+	// 保存刚刚选择的评论大图片
+	private String strCommentLargeImage;
+	// 人品值
+	int mnCredit = 0;
+	// 赞值
+	int mnCharmValue = 0;
+	// 显示人品值控件
+	TextView credittextview;
+	// 显示赞值控件
+	TextView charmvaluetextview;
+	// 任务重发按钮
+	Button resendbutton;
+	// 任务结束之后人品值和赞值的计数结果控件
+	TextView taskendtextview;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		// 程序启动的时候避免光标处在editview中而弹出输入法窗口
+		getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+		setContentView(R.layout.my_task);
+
+		CommentMaps = new HashMap<String, String>();
+
+		strSharePersonToRecImage = "";
+		strRecToSharePersonImage = "";
+
+		String strCustomerNameTemp;// 发布人名称
+		String strTaskAnnounceTime;// 发布时间
+		String strTimeLimit;// 时间限制
+		String strTaskTitle;// 任务标题
+		String strDetail;// 任务详细内容
+		String strRunSeconds;// 任务进行的秒数
+		String strImplementName;// 任务执行人
+		int nTaskTimeStatus;// 任务有效期状态
+		int nTaskImpleStatus;// 任务执行状态
+		// 动态信息
+		int nTaskSelectType;
+		int nTaskFinishType;
+		int nTaskVerifiType;
+		int nTaskAnnounceCommentType;
+		int nTaskImplementCommentType;
+
+		// 分享者对接收者的评论
+		String strAnnounceComment;
+		// 发布者给执行者的图片
+		String strAnnounceBase64Image;
+		// 接收者对分享者的评论
+		String strImpleComment;
+		// 执行者给发布者的图片
+		String strImpleBase64Image;
+
+		strCustomerNameTemp = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.customername");
+		strTaskAnnounceTime = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.TaskAnnounceTime");
+		strTimeLimit = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.TimeLimit");
+		strTaskTitle = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.TaskTitle");
+		strDetail = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.Detail");
+		strRunSeconds = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.RunSeconds");
+		strTaskId = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.TaskId");
+		strImplementName = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.TaskImplementName");
+		nTaskTimeStatus = getIntent().getIntExtra(
+				"com.renpin.RenPinMainActivity.nTimeStatus", -1);
+		nTaskImpleStatus = getIntent().getIntExtra(
+				"com.renpin.RenPinMainActivity.nTaskImplemeStatus", -1);
+		/*
+		 * mnTaskType = getIntent().getIntExtra(
+		 * "com.renpin.RenPinMainActivity.nTaskType", -1);
+		 */
+
+		nTaskSelectType = getIntent().getIntExtra(
+				"com.renpin.RenPinMainActivity.nTaskSelectType", -1);
+		nTaskFinishType = getIntent().getIntExtra(
+				"com.renpin.RenPinMainActivity.nTaskFinishType", -1);
+		nTaskVerifiType = getIntent().getIntExtra(
+				"com.renpin.RenPinMainActivity.nTaskVerifiType", -1);
+		nTaskAnnounceCommentType = getIntent().getIntExtra(
+				"com.renpin.RenPinMainActivity.nTaskAnnounceCommentType", -1);
+		nTaskImplementCommentType = getIntent().getIntExtra(
+				"com.renpin.RenPinMainActivity.nTaskImplementCommentType", -1);
+
+		strAnnounceComment = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.strAnnounceComment");
+		strAnnounceBase64Image = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.strAnnounceBase64Image");
+		strImpleComment = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.strImpleComment");
+		strImpleBase64Image = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.strImpleBase64Image");
+
+		msettings = getSharedPreferences("MekeSharedPreferences", 0);
+		// 创建接收消息对象
+		myhandler = new MyHandler();
+		if (null == mUtils) {
+			// 创建公共操作类对象
+			mUtils = new CommonUtils(this);
+		}
+		strAccountName1 = strCustomerNameTemp;
+		strImpleName2 = strImplementName;
+		nAccountComment1 = nTaskAnnounceCommentType;
+		nImpleComment1 = nTaskImplementCommentType;
+		// 接收评论人名称默认为任务发布人名称
+		strReceiveName = strCustomerNameTemp;
+		// 初始化界面
+		InitActivities(strCustomerNameTemp, strTaskAnnounceTime, strTimeLimit,
+				strTaskTitle, strDetail, strRunSeconds, strImplementName,
+				nTaskTimeStatus, nTaskImpleStatus, nTaskSelectType,
+				nTaskFinishType, nTaskVerifiType, nTaskAnnounceCommentType,
+				nTaskImplementCommentType, strAnnounceComment,
+				strAnnounceBase64Image, strImpleComment, strImpleBase64Image);
+		// 隐藏界面
+		init();
+		// 更新红点状态
+		UpdateDynamicStatus(strCustomerNameTemp, strImplementName, 3,
+				strTaskId, nTaskSelectType, nTaskFinishType, nTaskVerifiType,
+				nTaskAnnounceCommentType, nTaskImplementCommentType);
+		// 显示评论
+		ShowComments();
+	}
+
+	// 点击隐藏、显示界面
+	public void init() {
+		/*
+		 * linearlayout2_1 = (LinearLayout)
+		 * findViewById(R.id.my_task_linearlayout_list2); linearlayout2_1_1 =
+		 * (LinearLayout) findViewById(R.id.my_task_linearlayout_list2_1);
+		 * linearlayout2_1_1.setVisibility(View.GONE);
+		 * 
+		 * linearlayout3 = (LinearLayout)
+		 * findViewById(R.id.my_task_linearlayout_list3); linearlayout3_1 =
+		 * (LinearLayout) findViewById(R.id.my_task_linearlayout_list3_1);
+		 * linearlayout3_1.setVisibility(View.GONE); linearlayout4 =
+		 * (LinearLayout) findViewById(R.id.my_task_linearlayout_list4);
+		 * linearlayout4_1 = (LinearLayout)
+		 * findViewById(R.id.my_task_linearlayout_list4_1);
+		 * linearlayout4_1.setVisibility(View.GONE);
+		 */
+
+		/*
+		 * linearlayout2_1.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View arg0) { if (hideText2) {
+		 * linearlayout2_1_1.setVisibility(View.VISIBLE); hideText2 = false; }
+		 * else { linearlayout2_1_1.setVisibility(View.GONE); hideText2 = true;
+		 * } }
+		 * 
+		 * });
+		 * 
+		 * linearlayout3.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View arg0) { if (hideText3) {
+		 * linearlayout3_1.setVisibility(View.VISIBLE); hideText3 = false; }
+		 * else { linearlayout3_1.setVisibility(View.GONE); hideText3 = true; }
+		 * }
+		 * 
+		 * });
+		 * 
+		 * linearlayout4.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View arg0) { if (hideText4) {
+		 * linearlayout4_1.setVisibility(View.VISIBLE); hideText4 = false; }
+		 * else { linearlayout4_1.setVisibility(View.GONE); hideText4 = true; }
+		 * }
+		 * 
+		 * });
+		 */
+	}
+
+	private void ShowComments() {
+		Runnable run2 = new Runnable() {
+			public void run() {
+				mnRemainTime = goodService.GetTaskRemainTime(strTaskId, "2");
+				mCommentInfos = goodService.GetCommentsForTask(strTaskId, "2");
+				if (!strAccountName1.equals("")) {
+					// 根据人名称获取相应的人品值和赞值
+					mnCredit = goodService.GetCreditValue(strAccountName1);
+					mnCharmValue = goodService.GetCharmValue(strAccountName1);
+				}
+				// 获取任务缩放图片
+				taskicon = goodService.GetTaskSmallIcon(strTaskId, "2");
+				// 获取每张缩小图的放大图片
+				strIcons[0] = goodService.GetTaskLargeIcon(strTaskId, "2", 1);
+				strIcons[1] = goodService.GetTaskLargeIcon(strTaskId, "2", 2);
+				strIcons[2] = goodService.GetTaskLargeIcon(strTaskId, "2", 3);
+				strIcons[3] = goodService.GetTaskLargeIcon(strTaskId, "2", 4);
+				strIcons[4] = goodService.GetTaskLargeIcon(strTaskId, "2", 5);
+				strIcons[5] = goodService.GetTaskLargeIcon(strTaskId, "2", 6);
+
+				Message msg = myhandler.obtainMessage();
+				msg.what = 3;
+				myhandler.sendMessage(msg);
+			}
+		};
+		// 启动获取评论数据线程
+		Thread thread = new Thread(run2);
+		thread.start();
+	}
+
+	private boolean IsShowHotDot(String strTaskId, String CurrentPersonName) {
+		boolean bIsTure = false;
+		if (RenPinMainActivity.mDynamicNew != null) {
+			int nCount = RenPinMainActivity.mDynamicNew.size();
+			for (int i = 0; i < nCount; i++) {
+				String strAccounceName = RenPinMainActivity.mDynamicNew.get(i)
+						.getmPersonName();
+				String strId = RenPinMainActivity.mDynamicNew.get(i)
+						.getmstrId();
+				String strImpleAccouceName = RenPinMainActivity.mDynamicNew
+						.get(i).getmTaskImplementName();
+				// 如果这个任务是由当前用户创建的
+				if (CurrentPersonName.equals(strAccounceName)) {
+					boolean b1 = strTaskId.equals(strId);
+					boolean b3 = !strImpleAccouceName.equals("");
+
+					if (b1 && b3) {
+						if (2 == RenPinMainActivity.mDynamicNew.get(i)
+								.getnTaskImplementCommentType()) {
+							bIsTure = true;
+							break;
+						}
+					}
+
+				} else if (CurrentPersonName.equals(strImpleAccouceName)) {// 如果这个任务是由当前用户执行的
+					boolean b1 = strTaskId.equals(strId);
+					if (b1) {
+						if (2 == RenPinMainActivity.mDynamicNew.get(i)
+								.getnTaskAnnounceCommentType()) {
+							bIsTure = true;
+							break;
+						}
+					}
+				}
+
+			}
+		}
+		return bIsTure;
+	}
+
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+		} else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+		}
+	}
+
+	private void InitActivities(final String strCustomerNameTemp,
+			String strTaskAnnounceTime, String strTimeLimit,
+			String strTaskTitle, String strDetail, String strRunSeconds,
+			final String strImplementName, int nTaskTimeStatus,
+			int nTaskImpleStatus, int nTaskSelectType, int nTaskFinishType,
+			int nTaskVerifiType, int nTaskAnnounceCommentType,
+			int nTaskImplementCommentType, String strAnnounceComment,
+			String strAnnounceBase64Image, String strImpleComment,
+			String strImpleBase64Image) {
+
+		imageview1 = (ImageView) findViewById(R.id.mytask_imageview1);
+		textview1 = (TextView) findViewById(R.id.mytask_textview1);
+		textview2 = (TextView) findViewById(R.id.mytask_textview2);
+		textview4 = (TextView) findViewById(R.id.mytask_textview4);
+		textview5 = (TextView) findViewById(R.id.mytask_textview5);
+		textview5_1 = (TextView) findViewById(R.id.mytask_textview_title);
+		textview6 = (TextView) findViewById(R.id.mytask_textview6);
+		imageview3 = (ImageView) findViewById(R.id.mytask_imageview3);
+		textview9 = (TextView) findViewById(R.id.mytask_textview9);
+		credittextview = (TextView) findViewById(R.id.mytask_credittextview);
+		charmvaluetextview = (TextView) findViewById(R.id.mytask_charmtextview);
+
+		imageview4 = (ImageView) findViewById(R.id.customer_login_image1);
+		edittext1 = (EditText) findViewById(R.id.my_task_edittext1);
+		button5 = (Button) findViewById(R.id.my_task_button1);
+		resendbutton = (Button) findViewById(R.id.mytask_resendbutton);
+		imageview5 = (ImageView) findViewById(R.id.mytask_imageview4);
+		linearlayout1 = (LinearLayout) findViewById(R.id.mytask_linearlayout1);
+		linearlayout2 = (LinearLayout) findViewById(R.id.comment_item_linearlayout1);
+
+		imageview10 = (ImageView) findViewById(R.id.mytask_imageview10);
+		textview16 = (TextView) findViewById(R.id.mytask_textview16);
+		textview18 = (TextView) findViewById(R.id.mytask_textview17);
+		thanksbutton = (Button) findViewById(R.id.mytask_thanksbutton);
+		sendpictureimageview = (ImageView) findViewById(R.id.mytask_sendpicture);
+		taskendtextview = (TextView) findViewById(R.id.mytask_endinfo);
+		// 任务发布图片控件
+		imagetask1 = (ImageView) findViewById(R.id.mytask_icon1);
+		imagetask2 = (ImageView) findViewById(R.id.mytask_icon2);
+		imagetask3 = (ImageView) findViewById(R.id.mytask_icon3);
+		imagetask4 = (ImageView) findViewById(R.id.mytask_icon4);
+		imagetask5 = (ImageView) findViewById(R.id.mytask_icon5);
+		imagetask6 = (ImageView) findViewById(R.id.mytask_icon6);
+		imagetask1.setClickable(false);
+		imagetask2.setClickable(false);
+		imagetask3.setClickable(false);
+		imagetask4.setClickable(false);
+		imagetask5.setClickable(false);
+		imagetask6.setClickable(false);
+
+		textview18.setText("【分享】");
+
+		Bitmap bmp = RenPinMainActivity.mAnnounceImage;
+		imageview1.setImageBitmap(bmp);
+		textview1.setText(strCustomerNameTemp);
+		textview2.setText(strTaskAnnounceTime);
+		int nLimit = Integer.parseInt(strTimeLimit);
+		int nRunSecond = Integer.parseInt(strRunSeconds);
+		mnRemainTime = nLimit - nRunSecond;
+		String strAccountName = msettings.getString("PersonName", "");
+		String strTime = mUtils.GetStringBySeconds(mnRemainTime);
+		// textview4.setText(strTime);
+		textview5.setText(strTaskTitle);
+		textview6.setText(strDetail);
+		textview5_1.setText(strTaskTitle);
+
+		if (null == mthre/* && mnRemainTime > 0 */) {
+			mbIsContinue = true;
+			mthre = new Thread(run1);
+			mthre.start();
+		}
+
+		// 如果这个任务是由当前用户抢下的
+		if (strImplementName.equals(strAccountName)) {
+
+			resendbutton.setVisibility(View.GONE);
+			thanksbutton.setVisibility(View.VISIBLE);
+
+			if (2 == nTaskVerifiType || 3 == nTaskVerifiType) {// 如果这个任务验证成功
+				// textview8.setText(strAnnounceComment);
+				textview16.setText(strImpleComment);
+				thanksbutton.setVisibility(View.GONE);
+
+				if (strImpleBase64Image.equals("")) {
+					imageview10.setVisibility(View.GONE);
+				} else {
+					imageview10.setImageBitmap(mUtils
+							.base64ToBitmap(strImpleBase64Image));
+				}
+			} else if (4 == nTaskVerifiType) {// 如果这个任务验证失败
+
+				textview16.setText(strImpleComment);
+
+				if (strImpleBase64Image.equals("")) {
+					imageview10.setVisibility(View.GONE);
+				} else {
+					imageview10.setImageBitmap(mUtils
+							.base64ToBitmap(strImpleBase64Image));
+				}
+
+			} else if (2 == nTaskFinishType || 3 == nTaskFinishType) {// 如果这个分享已经完成等待接收者确认
+
+				imageview10.setVisibility(View.GONE);
+
+			} else if (!strImplementName.equals("")
+					&& (2 == nTaskSelectType || 3 == nTaskSelectType)) {// 如果这个任务已经有人接收,正在执行
+
+				imageview10.setVisibility(View.GONE);
+			}
+		} else {// 如果这个任务是由当前用户分享的
+
+			// 除非任务已经结束,否则都允许任务重置
+			if (1 == nTaskVerifiType) {
+				resendbutton.setVisibility(View.VISIBLE);
+			} else {
+				resendbutton.setVisibility(View.GONE);
+			}
+			thanksbutton.setVisibility(View.GONE);
+			// 如果这个任务还没有人接收
+			if (strImplementName.equals("")) {
+				imageview10.setVisibility(View.GONE);
+			} else if (2 == nTaskVerifiType || 3 == nTaskVerifiType) {// 这个任务验证成功
+				// textview8.setText(strAnnounceComment);
+				textview16.setText(strImpleComment);
+				if (strImpleBase64Image.equals("")) {
+					imageview10.setVisibility(View.GONE);
+				} else {
+					imageview10.setImageBitmap(mUtils
+							.base64ToBitmap(strImpleBase64Image));
+				}
+			} else if (4 == nTaskVerifiType) {// 这个任务验证失败
+				// textview8.setText(strAnnounceComment);
+				textview16.setText(strImpleComment);
+				if (strImpleBase64Image.equals("")) {
+					imageview10.setVisibility(View.GONE);
+				} else {
+					imageview10.setImageBitmap(mUtils
+							.base64ToBitmap(strImpleBase64Image));
+				}
+			} else if (2 == nTaskFinishType || 3 == nTaskFinishType) {// 这个任务等待确认
+
+			} else if (2 == nTaskSelectType || 3 == nTaskSelectType) {// 这个任务正在执行
+
+			}
+		}
+		imageview4.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				mbIsContinue = false;
+				ShareDynamicDetailActivity.this.finish();
+			}
+		});
+
+		thanksbutton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {// //将任务完成状态修改,值改为2
+				Intent it = new Intent(ShareDynamicDetailActivity.this,
+						TaskAnnounceVertifOperaActivity.class);
+				it.putExtra(
+						"com.renpin.DynamicDetailActivity.strImplementName",
+						strCustomerNameTemp);
+				it.putExtra("com.renpin.RenPinMainActivity.TaskId", strTaskId);
+				it.putExtra("com.renpin.RenPinMainActivity.TaskType", "2");
+				startActivityForResult(it, 2);
+				// startActivity(it);
+			}
+		});
+
+		resendbutton.setOnClickListener(new OnClickListener() {
+
+			Runnable runre = new Runnable() {
+				public void run() {
+					int nRet = 0;
+
+					// 将这个任务重新设置为没有拿下或抢下状态
+					nRet = goodService.ResetTaskStatue(strTaskId, "2");
+
+					String strOperMsg;
+					if (1 == nRet) {
+						strOperMsg = "操作成功";
+					} else {
+						strOperMsg = "操作失败";
+					}
+					Message msg = myhandler.obtainMessage();
+					msg.what = 9;
+					Bundle b = new Bundle();// 存放数据
+					b.putString("OperMsg", strOperMsg);
+					msg.setData(b);
+					myhandler.sendMessage(msg);
+				}
+			};
+
+			@Override
+			public void onClick(View v) {
+				AlertDialog.Builder dialog = new AlertDialog.Builder(
+						ShareDynamicDetailActivity.this);
+				dialog.setMessage("您的分享将恢复到发布时的初始状态");
+				dialog.setTitle("提示");
+				dialog.setPositiveButton("确定",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// 启动更新状态数据线程
+								Thread thread = new Thread(runre);
+								thread.start();
+							}
+						}).setNegativeButton("取消",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								dialog.dismiss();
+							}
+						});
+				dialog.show();
+			}
+		});
+
+		sendpictureimageview.setOnClickListener(new OnClickListener() {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void onClick(View v) {
+				showDialog(0);
+			}
+		});
+
+		imageview3.setOnClickListener(new OnClickListener() {
+
+			Runnable GetCommentRun = new Runnable() {
+				public void run() {
+					mCommentInfos = goodService.GetCommentsForTask(strTaskId,
+							"2");
+					Message msg = myhandler.obtainMessage();
+					msg.what = 3;
+					myhandler.sendMessage(msg);
+
+					int nRet = 0;
+					String strAccountNameTemp = msettings.getString(
+							"PersonName", "");
+
+					// 如果查看的任务是由当前用户发布的
+					if (strAccountNameTemp.equals(strAccountName1)) {
+						// if (2 == nImpleComment1) {
+						// 更新执行者评论状态
+						nRet = goodService.UpdateTaskImplementCommentType(
+								strAccountName1, 3, strTaskId, "2");
+						// }
+
+					} else if (strAccountNameTemp.equals(strImpleName2)) {// 如果查看的任务是由当前用户执行的
+						// if (2 == nAccountComment1) {
+						// 更新发布者评论状态
+						nRet = goodService.UpdateTaskAnnounceCommentType(
+								strImpleName2, 3, strTaskId, "2");
+						// }
+					}
+				}
+			};
+
+			@Override
+			public void onClick(View v) {
+				// 启动获取评论数据线程
+				Thread thread = new Thread(GetCommentRun);
+				thread.start();
+			}
+		});
+
+		button5.setOnClickListener(new OnClickListener() {
+
+			Runnable SendCommentContent = new Runnable() {
+				public void run() {
+					// 当前用户名称
+					String strCurrentName = msettings.getString("PersonName",
+							"");
+					// 当前用户图标
+					String strCurrentImage = msettings.getString("Base64Image",
+							"");
+					String strContent1 = ShareDynamicDetailActivity.this.edittext1
+							.getText().toString();
+					int nRet = 0;
+					if (bIsTalkToPerson) {
+						// 评论内容
+						nRet = goodService.SendCommentContent(strTaskId,
+								strCurrentName, strReceiveName, strContent1,
+								strCurrentImage, "2");
+					} else {
+						// 评论内容
+						nRet = goodService.SendCommentContent(strTaskId,
+								strCurrentName, "", strContent1,
+								strCurrentImage, "2");
+					}
+
+					String strOperMsg;
+					if (1 == nRet) {
+						strOperMsg = "操作成功";
+					} else {
+						strOperMsg = "操作失败";
+					}
+					Message msg = myhandler.obtainMessage();
+					msg.what = 4;
+					Bundle b = new Bundle();// 存放数据
+					b.putString("OperMsg", strOperMsg);
+					msg.setData(b);
+					myhandler.sendMessage(msg);
+
+				}
+			};
+
+			@Override
+			public void onClick(View v) {
+				String strContent1 = ShareDynamicDetailActivity.this.edittext1
+						.getText().toString();
+				if (!strContent1.equals("")) {
+					button5.setText("正在发送...");
+					button5.setEnabled(false);
+					button5.setTextColor(Color.rgb(96, 96, 96));
+					// 启动获取评论数据线程
+					Thread thread = new Thread(SendCommentContent);
+					thread.start();
+				} else {
+					CommonUtils.ShowToastCenter(getBaseContext(), "发送的内容不能为空",
+							Toast.LENGTH_LONG);
+				}
+			}
+		});
+
+		imagetask1.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ShareDynamicDetailActivity.this,
+						ViewPagerActivity.class);
+				intent.putExtra("type", 2);
+				intent.putExtra("iconposion", 0);
+				startActivity(intent);
+			}
+
+		});
+
+		imagetask2.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ShareDynamicDetailActivity.this,
+						ViewPagerActivity.class);
+				intent.putExtra("type", 2);
+				intent.putExtra("iconposion", 1);
+				startActivity(intent);
+			}
+
+		});
+
+		imagetask3.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ShareDynamicDetailActivity.this,
+						ViewPagerActivity.class);
+				intent.putExtra("type", 2);
+				intent.putExtra("iconposion", 2);
+				startActivity(intent);
+			}
+
+		});
+
+		imagetask4.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ShareDynamicDetailActivity.this,
+						ViewPagerActivity.class);
+				intent.putExtra("type", 2);
+				intent.putExtra("iconposion", 3);
+				startActivity(intent);
+			}
+
+		});
+
+		imagetask5.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ShareDynamicDetailActivity.this,
+						ViewPagerActivity.class);
+				intent.putExtra("type", 2);
+				intent.putExtra("iconposion", 4);
+				startActivity(intent);
+			}
+
+		});
+
+		imagetask6.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ShareDynamicDetailActivity.this,
+						ViewPagerActivity.class);
+				intent.putExtra("type", 2);
+				intent.putExtra("iconposion", 5);
+				startActivity(intent);
+			}
+
+		});
+
+		imageview10.setOnClickListener(new OnClickListener() {
+
+			Runnable runimageview10 = new Runnable() {
+				public void run() {
+					if (strRecToSharePersonImage.equals("")) {
+						strRecToSharePersonImage = goodService
+								.GetTaskVerifiLargeImage(strTaskId, "2");
+					}
+					Message msg = myhandler.obtainMessage();
+					msg.what = 6;
+					myhandler.sendMessage(msg);
+				}
+			};
+
+			@Override
+			public void onClick(View v) {
+				// 启动获取评论数据线程
+				Thread thread = new Thread(runimageview10);
+				thread.start();
+			}
+
+		});
+	}
+
+	@SuppressWarnings("deprecation")
+	private void ShowTaskStatus(String strImpleAccouceName,
+			int nTaskSelectType, int nTaskFinishType, int nTaskVerifiType) {
+
+		nTaskPosition = 1;
+
+		if (2 == nTaskSelectType || 3 == nTaskSelectType) {
+
+			nTaskPosition = 2;
+		}
+
+		if (2 == nTaskFinishType || 3 == nTaskFinishType) {
+			nTaskPosition = 3;
+		}
+
+		if (2 == nTaskVerifiType || 3 == nTaskVerifiType) {
+			nTaskPosition = 4;
+		}
+	}
+
+	// 更新用户动态
+	private void UpdateDynamicStatus(final String strAnnounceName,
+			final String strImpleName, final int nValue,
+			final String strTaskId, final int nTaskSelectType,
+			final int nTaskFinishType, final int nTaskVerifiType,
+			final int nTaskAnnounceCommentType,
+			final int nTaskImplementCommentType) {
+
+		Runnable runup = new Runnable() {
+			public void run() {
+				int nRet = 0;
+				String strAccountNameTemp = msettings.getString("PersonName",
+						"");
+				// 如果查看的是由当前用户分享的
+				if (strAccountNameTemp.equals(strAnnounceName)) {
+					if (2 == nTaskSelectType) {
+						// 更新分享抢下状态
+						nRet = goodService.UpdateTaskSelectType(
+								strAnnounceName, nValue, strTaskId, "2");
+					}
+					if (2 == nTaskVerifiType) {
+						// 更新验证状态
+						nRet = goodService.UpdateTaskVerifiType(2,
+								strAnnounceName, nValue, strTaskId, "", "");
+					}
+					if (2 == nTaskImplementCommentType) {
+						// 更新执行者评论状态
+						nRet = goodService.UpdateTaskImplementCommentType(
+								strAnnounceName, nValue, strTaskId, "2");
+					}
+
+				} else if (strAccountNameTemp.equals(strImpleName)) {// 如果查看的任务是由当前用户接收的
+					if (2 == nTaskFinishType) {
+						// 更新完成状态
+						nRet = goodService.UpdateTaskFinishType(2,
+								strImpleName, nValue, strTaskId, "", "");
+					}
+					if (2 == nTaskAnnounceCommentType) {
+						// 更新发布者评论状态
+						nRet = goodService.UpdateTaskAnnounceCommentType(
+								strImpleName, nValue, strTaskId, "2");
+					}
+				}
+				String strOperMsg;
+				if (1 == nRet) {
+					strOperMsg = "操作成功";
+				} else {
+					strOperMsg = "操作失败";
+				}
+				Message msg = myhandler.obtainMessage();
+				msg.what = 2;
+				Bundle b = new Bundle();// 存放数据
+				b.putString("OperMsg", strOperMsg);
+				msg.setData(b);
+				myhandler.sendMessage(msg);
+			}
+		};
+		// 启动更新状态数据线程
+		Thread thread = new Thread(runup);
+		thread.start();
+	}
+
+	@SuppressWarnings("deprecation")
+	/*
+	 * private void ShowTaskRunStatus() { if (0 == nStatusImageIndex) { if (1 ==
+	 * nTaskPosition) { imageview7.setBackgroundDrawable(null); } else if (2 ==
+	 * nTaskPosition) { imageview8.setBackgroundDrawable(null); } else if (3 ==
+	 * nTaskPosition) { imageview9.setBackgroundDrawable(null); }
+	 * nStatusImageIndex = 1; } else if (1 == nStatusImageIndex) { if (1 ==
+	 * nTaskPosition) {
+	 * imageview7.setBackgroundDrawable(getResources().getDrawable(
+	 * R.drawable.arrow)); } else if (2 == nTaskPosition) {
+	 * imageview8.setBackgroundDrawable(getResources().getDrawable(
+	 * R.drawable.arrow)); } else if (3 == nTaskPosition) {
+	 * imageview9.setBackgroundDrawable(getResources().getDrawable(
+	 * R.drawable.arrow)); } nStatusImageIndex = 0; } }
+	 */
+	private void UpdateStatusText(String strTaskId) {
+
+		if (RenPinMainActivity.mDynamicNew != null) {
+			int nCount = RenPinMainActivity.mDynamicNew.size();
+			for (int i = 0; i < nCount; i++) {
+
+				String strId = RenPinMainActivity.mDynamicNew.get(i)
+						.getmstrId();
+				String strImpleAccouceName = RenPinMainActivity.mDynamicNew
+						.get(i).getmTaskImplementName();
+
+				boolean b1 = strTaskId.equals(strId);
+				if (b1) {
+					// 动态显示状态信息
+					ShowTaskStatus(strImpleAccouceName,
+							RenPinMainActivity.mDynamicNew.get(i)
+									.getnTaskSelectType(),
+							RenPinMainActivity.mDynamicNew.get(i)
+									.getnTaskFinishType(),
+							RenPinMainActivity.mDynamicNew.get(i)
+									.getnTaskVerifiType());
+					break;
+				}
+
+			}
+		}
+	}
+
+	class MyHandler extends Handler {
+		// 子类必须重写此方法,接受数据
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			switch (msg.what) {
+			case 0:
+				Bundle b = msg.getData();
+				String strMsg = b.getString("Msg");
+				CommonUtils.ShowToastCenter(ShareDynamicDetailActivity.this,
+						strMsg, Toast.LENGTH_LONG);
+				break;
+			case 1:
+				long nTime = mnRemainTime;
+				if (nTime >= 0) {
+					String strTime = mUtils.GetStringBySeconds(nTime);
+					textview4.setText(strTime);
+					mnRemainTime -= 1;
+					if (mnRemainTime <= 0) {
+						/*
+						 * button1.setTextColor(Color.rgb(96, 96, 96));
+						 * button1.setEnabled(false);
+						 * button2.setTextColor(Color.rgb(96, 96, 96));
+						 * button2.setEnabled(false);
+						 * button3.setTextColor(Color.rgb(96, 96, 96));
+						 * button3.setEnabled(false);
+						 * button4.setTextColor(Color.rgb(96, 96, 96));
+						 * button4.setEnabled(false);
+						 */
+					}
+				} else if (mnRemainTime < 0) {
+					// mbIsContinue = false;
+				}
+				Bundle bhot = msg.getData();
+				String hottype = bhot.getString("nShowHot");
+				int nHotType = Integer.parseInt(hottype);
+				if (1 == nHotType) {
+					Resources res = getResources();
+					Bitmap bmp = BitmapFactory.decodeResource(res,
+							R.drawable.red_oval);
+					imageview5.setImageBitmap(bmp);
+					if (mCommentInfos != null) {
+						// 设置评论条数
+						textview9.setText("" + mCommentInfos.size());
+					} else {
+						// 设置评论条数
+						textview9.setText("0");
+					}
+				} else {
+					imageview5.setImageBitmap(null);
+				}
+				// 显示任务运行状态
+				// ShowTaskRunStatus();
+				// 实时动态显示任务运行过程
+				UpdateStatusText(strTaskId);
+				break;
+
+			case 2:
+				/*
+				 * Bundle b1 = msg.getData(); String strOperMsg =
+				 * b1.getString("OperMsg");
+				 * Toast.makeText(ShareDynamicDetailActivity.this, strOperMsg,
+				 * Toast.LENGTH_LONG).show();
+				 */
+				break;
+			case 3:
+				if (mCommentInfos != null) {
+					// 动态生成评论的界面
+					AutoCreateCommentWidows();
+
+				} else {
+					if (!isConnectInternet()) {
+						Toast.makeText(ShareDynamicDetailActivity.this,
+								"网络不给力哦!", Toast.LENGTH_LONG).show();
+					}
+				}
+				if (taskicon != null) {
+					imagetask1.setImageBitmap(mUtils.base64ToBitmap(taskicon
+							.getstrIcon1()));
+					imagetask2.setImageBitmap(mUtils.base64ToBitmap(taskicon
+							.getstrIcon2()));
+					imagetask3.setImageBitmap(mUtils.base64ToBitmap(taskicon
+							.getstrIcon3()));
+					imagetask4.setImageBitmap(mUtils.base64ToBitmap(taskicon
+							.getstrIcon4()));
+					imagetask5.setImageBitmap(mUtils.base64ToBitmap(taskicon
+							.getstrIcon5()));
+					imagetask6.setImageBitmap(mUtils.base64ToBitmap(taskicon
+							.getstrIcon6()));
+					imagetask1.setClickable(true);
+					imagetask2.setClickable(true);
+					imagetask3.setClickable(true);
+					imagetask4.setClickable(true);
+					imagetask5.setClickable(true);
+					imagetask6.setClickable(true);
+				}
+				credittextview.setText("人品:" + mnCredit);
+				charmvaluetextview.setText(mnCharmValue + "");
+				break;
+			case 4:
+				Bundle b2 = msg.getData();
+				String strOperMsg1 = b2.getString("OperMsg");
+				Toast.makeText(ShareDynamicDetailActivity.this, strOperMsg1,
+						Toast.LENGTH_LONG).show();
+				button5.setText("发送");
+				button5.setEnabled(true);
+				button5.setTextColor(Color.rgb(255, 255, 255));
+				// edittext1.setHint("评论");
+				edittext1.setText("");
+				break;
+			case 5:
+				Intent intent = new Intent(ShareDynamicDetailActivity.this,
+						TaskFinishOrVertifiImage.class);
+				intent.putExtra("type", 2);
+				intent.putExtra("icontype", 1);// 图片类型,1表示分享给接收,2表示接收给分享
+				startActivity(intent);
+				break;
+			case 6:
+				Intent intent1 = new Intent(ShareDynamicDetailActivity.this,
+						TaskFinishOrVertifiImage.class);
+				intent1.putExtra("type", 2);
+				intent1.putExtra("icontype", 2);
+				startActivity(intent1);
+				break;
+			case 7:
+				Bundle b3 = msg.getData();
+				// String strCommentImage = b3.getString("commentimage");
+				int nCommentIndex = b3.getInt("commentindex");
+				// CommentMaps.put("" + nCommentIndex, strCommentImage);
+				// 显示图片
+				Intent intent3 = new Intent(ShareDynamicDetailActivity.this,
+						CommentActivity.class);
+				intent3.putExtra("nCommentIndex", nCommentIndex);
+				intent3.putExtra("nType", 2);
+
+				startActivity(intent3);
+				break;
+			case 8:
+				Bundle b4 = msg.getData();
+				int nCommentRet = b4.getInt("nRet");
+				if (0 == nCommentRet) {
+					CommonUtils.ShowToastCenter(getBaseContext(), "发送失败",
+							Toast.LENGTH_LONG);
+				} else if (1 == nCommentRet) {
+					CommonUtils.ShowToastCenter(getBaseContext(), "发送成功",
+							Toast.LENGTH_LONG);
+				}
+				break;
+			case 9:
+				Bundle b5 = msg.getData();
+				String strResetTaskMsg = b5.getString("OperMsg");
+				CommonUtils.ShowToastCenter(getBaseContext(), strResetTaskMsg,
+						Toast.LENGTH_LONG);
+				break;
+			}
+		}
+	}
+
+	private void AutoCreateCommentWidows() {
+
+		int nCount = mCommentInfos.size();
+		// 先将linearlayout1清空
+		linearlayout1.removeAllViews();
+
+		if (nCount <= 0) {
+			textview9.setText("暂无评论");
+		} else {
+			// 设置评论条数
+			textview9.setText("" + mCommentInfos.size());
+
+			for (int i = 0; i < nCount; i++) {
+
+				final CommentInfo commentinfo = mCommentInfos.get(i);
+
+				View cfg_view = getLayoutInflater().inflate(
+						R.layout.comment_item, null);
+
+				// 图标
+				ImageView imageview = (ImageView) cfg_view
+						.findViewById(R.id.comment_item_imageview1);
+				// 评论人名称
+				TextView AccountPerosn = (TextView) cfg_view
+						.findViewById(R.id.comment_item_textview1);
+				// 接收评论人名称
+				TextView ReceivePerson = (TextView) cfg_view
+						.findViewById(R.id.comment_item_textview3);
+				// 评论时间
+				TextView CommentTime = (TextView) cfg_view
+						.findViewById(R.id.comment_item_textview4);
+
+				// 评论内容
+				TextView Contenttext = (TextView) cfg_view
+						.findViewById(R.id.comment_item_textview5);
+
+				TextView textview10 = (TextView) cfg_view
+						.findViewById(R.id.comment_item_textview2);
+				// 评论图片
+				ImageView largeimageview = (ImageView) cfg_view
+						.findViewById(R.id.comment_item_imageview2);
+
+				Bitmap image = mUtils.base64ToBitmap(commentinfo
+						.getstrCommentPersonImage());
+				// 如果没有图标,那么就用默认图标
+				if (null == image) {
+					Resources res = getResources();
+					image = BitmapFactory.decodeResource(res,
+							R.drawable.noperson);
+				}
+				imageview.setImageBitmap(image);
+				AccountPerosn.setText(commentinfo.getstrCommentPersonName());
+				// 如果没有接收人则不显示谁回复谁
+				if (commentinfo.getstrCommentReceivePersonName().equals("")) {
+					textview10.setText("");
+				} else {
+					textview10.setText("回复");
+				}
+				ReceivePerson.setText(commentinfo
+						.getstrCommentReceivePersonName());
+				CommentTime.setText(commentinfo.getstrCommentTime());
+				// 判断评论是图片形式还是文字形式
+				if (commentinfo.getnCommentIndex() > 0) {
+					Contenttext.setVisibility(View.GONE);
+					largeimageview.setVisibility(View.VISIBLE);
+					// 评论采用图片形式
+					largeimageview.setImageBitmap(mUtils
+							.base64ToBitmap(commentinfo.getstrSmallImage()));
+				} else {// 评论采用文字形式
+					largeimageview.setVisibility(View.GONE);
+					Contenttext.setVisibility(View.VISIBLE);
+					Contenttext.setText(commentinfo.getstrCommentContent());
+				}
+				linearlayout1.addView(cfg_view, i);
+
+				largeimageview.setOnClickListener(new OnClickListener() {
+					Runnable runcomment = new Runnable() {
+						public void run() {
+							String strCommentImage = goodService
+									.GetCommentsLargeImage(strTaskId, "2",
+											commentinfo.getnCommentIndex());
+							if (!strCommentImage.equals("")) {
+								CommentMaps.put(commentinfo.getnCommentIndex()
+										+ "", strCommentImage);
+								Message msg = myhandler.obtainMessage();
+								Bundle b = new Bundle();
+								// b.putString("commentimage", strCommentImage);
+								b.putInt("commentindex",
+										commentinfo.getnCommentIndex());
+								msg.setData(b);
+								msg.what = 7;
+								myhandler.sendMessage(msg);
+							}
+
+						}
+					};
+
+					@Override
+					public void onClick(View v) {
+						int nIndex = commentinfo.getnCommentIndex();
+						// 先判断评论大图片数据是否下载下来了
+						String strImage = null;
+						if (CommentMaps != null) {
+							strImage = CommentMaps.get(nIndex + "");
+						}
+						// 如果之前没有下载该图片,那么就下载
+						if (null == strImage) {
+							// 启动获取评论数据线程
+							Thread thread = new Thread(runcomment);
+							thread.start();
+						} else {// 直接显示图片
+							Intent intent = new Intent(
+									ShareDynamicDetailActivity.this,
+									CommentActivity.class);
+							intent.putExtra("nCommentIndex",
+									commentinfo.getnCommentIndex());
+							intent.putExtra("nType", 2);
+
+							startActivity(intent);
+						}
+					}
+
+				});
+				// 处理点击事件
+				cfg_view.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						String strCommentPersonName;// 评论人名称
+
+						// 评论人名称
+						TextView AccountPerosn = (TextView) v
+								.findViewById(R.id.comment_item_textview1);
+
+						strCommentPersonName = AccountPerosn.getText()
+								.toString();
+
+						String strCurrentName = msettings.getString(
+								"PersonName", "");
+						// 如果指定回复人是自己,那么就不做指定处理
+						if (!strCommentPersonName.equals(strCurrentName)) {
+							String strContent = "回复" + strCommentPersonName;
+							strReceiveName = strCommentPersonName;
+							edittext1.setHint(strContent);
+							bIsTalkToPerson = true;
+						} else {
+							edittext1.setHint("评论");
+							bIsTalkToPerson = false;
+						}
+					}
+				});
+			}
+		}
+	}
+
+	public boolean isConnectInternet() {
+
+		ConnectivityManager conManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+		NetworkInfo networkInfo = conManager.getActiveNetworkInfo();
+
+		if (networkInfo != null) { // 这个判断一定要加上，要不然会出错
+			return networkInfo.isAvailable();
+		}
+		return false;
+	}
+
+	private List<HashMap<String, Object>> getListData(int nCount) {
+		List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> map = null;
+
+		for (int i = 0; i < nCount; i++) {
+			// 评论人的图片
+			String strCommentPersonImage;
+			// 评论人的名称
+			String strCommentPersonName;
+			// 被评论人的名称
+			String strCommentReceivePersonName;
+			// 评论时间
+			String strCommentTime;
+			// 评论内容
+			String strCommentContent;
+
+			strCommentPersonImage = mCommentInfos.get(i)
+					.getstrCommentPersonImage();
+			strCommentPersonName = mCommentInfos.get(i)
+					.getstrCommentPersonName();
+			strCommentReceivePersonName = mCommentInfos.get(i)
+					.getstrCommentReceivePersonName();
+			strCommentTime = mCommentInfos.get(i).getstrCommentTime();
+			strCommentContent = mCommentInfos.get(i).getstrCommentContent();
+
+			// 将获取到的数据存储到容器中
+			map = new HashMap<String, Object>();
+			map.put("strCommentPersonImage", strCommentPersonImage);
+			map.put("strCommentPersonName", strCommentPersonName);
+			map.put("strCommentReceivePersonName", strCommentReceivePersonName);
+			map.put("strCommentTime", strCommentTime);
+			map.put("strCommentContent", strCommentContent);
+			list.add(map);
+		}
+		return list;
+	}
+
+	class CommentsListAdpater extends SimpleAdapter {
+
+		private LayoutInflater mInflater;
+		Context context;
+		int count = 0;
+		private List<HashMap<String, Object>> mItemList;
+
+		@SuppressWarnings("unchecked")
+		public CommentsListAdpater(Context context,
+				List<? extends HashMap<String, Object>> data, int resource,
+				String[] from, int[] to) {
+			super(context, data, resource, from, to);
+			mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			this.context = context;
+			mItemList = (List<HashMap<String, Object>>) data;
+			if (data == null) {
+				count = 0;
+			} else {
+				count = data.size();
+			}
+		}
+
+		public int getCount() {
+			return mItemList.size();
+		}
+
+		public Object getItem(int pos) {
+
+			return mItemList.get(pos);
+		}
+
+		public long getItemId(int pos) {
+			return pos;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = (Map<String, Object>) getItem(position);
+
+			if (null == convertView) {
+				convertView = mInflater.inflate(R.layout.comment_item, null);
+			}
+			// 图标
+			ImageView imageview = (ImageView) convertView
+					.findViewById(R.id.comment_item_imageview1);
+			// 评论人名称
+			TextView AccountPerosn = (TextView) convertView
+					.findViewById(R.id.comment_item_textview1);
+			// 接收评论人名称
+			TextView ReceivePerson = (TextView) convertView
+					.findViewById(R.id.comment_item_textview3);
+			// 评论时间
+			TextView CommentTime = (TextView) convertView
+					.findViewById(R.id.comment_item_textview4);
+
+			// 评论内容
+			TextView Contenttext = (TextView) convertView
+					.findViewById(R.id.comment_item_textview5);
+
+			TextView textview10 = (TextView) convertView
+					.findViewById(R.id.comment_item_textview2);
+
+			Bitmap image = mUtils.base64ToBitmap(map.get(
+					"strCommentPersonImage").toString());
+			imageview.setImageBitmap(image);
+			AccountPerosn.setText(map.get("strCommentPersonName").toString());
+			// 如果没有接收人则不显示谁回复谁
+			if (map.get("strCommentReceivePersonName").toString().equals("")) {
+				textview10.setText("");
+			} else {
+				textview10.setText("回复");
+			}
+			ReceivePerson.setText(map.get("strCommentReceivePersonName")
+					.toString());
+			CommentTime.setText(map.get("strCommentTime").toString());
+			Contenttext.setText(map.get("strCommentContent").toString());
+			return convertView;
+		}
+
+	}
+
+	// 开始向服务器发送添加数据的请求
+	Runnable run1 = new Runnable() {
+		public void run() {
+			while (mbIsContinue) {
+				int nHotType = 0;
+
+				String strAccountNameTemp = msettings.getString("PersonName",
+						"");
+				// 判读是否有最新的评论
+				if (IsShowHotDot(strTaskId, strAccountNameTemp)) {
+					nHotType = 1;
+				}
+
+				mnRemainTime = goodService.GetTaskRemainTime(strTaskId, "2");
+
+				Message msg = myhandler.obtainMessage();
+				Bundle b = new Bundle();// 存放数据
+				b.putString("nShowHot", "" + nHotType);
+				msg.setData(b);
+				msg.what = 1;
+				myhandler.sendMessage(msg);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+	};
+
+	// 开始向服务器发送评论图片
+	Runnable commentrun = new Runnable() {
+		public void run() {
+			// 当前用户名称
+			String strCurrentName = msettings.getString("PersonName", "");
+			// 当前用户图标
+			String strCurrentImage = msettings.getString("Base64Image", "");
+
+			int nRet = 0;
+			if (bIsTalkToPerson) {
+				nRet = goodService.SendCommentImage(strTaskId, strCurrentName,
+						strReceiveName, strCurrentImage, strCommentSmallImage,
+						strCommentLargeImage, "2");
+			} else {
+				nRet = goodService.SendCommentImage(strTaskId, strCurrentName,
+						"", strCurrentImage, strCommentSmallImage,
+						strCommentLargeImage, "2");
+			}
+
+			Message msg = myhandler.obtainMessage();
+			Bundle b = new Bundle();
+			b.putInt("nRet", nRet);
+			msg.setData(b);
+			msg.what = 8;
+			myhandler.sendMessage(msg);
+		}
+	};
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		Bitmap bitmap = null;
+		if (requestCode == 0) {
+			String strImagePath = Environment.getExternalStorageDirectory()
+					+ "/" + "carPhoto" + "/" + "Car.jpg";
+			// 先判断该文件是否存在
+			File pImageFile = new File(strImagePath);
+			if (pImageFile.exists()) {
+				// 对图片进行旋转处理
+				mUtils.rotatePhoto(strImagePath);
+
+				File imgFile = new File(strImagePath);
+				try {
+					Uri imgUri = Uri
+							.parse(android.provider.MediaStore.Images.Media
+									.insertImage(getContentResolver(),
+											imgFile.getAbsolutePath(), null,
+											null));
+					String[] proj = { MediaStore.Images.Media.DATA };
+					@SuppressWarnings("deprecation")
+					Cursor cursor = managedQuery(imgUri, proj, null, null, null);
+					int column_index = cursor
+							.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+					cursor.moveToFirst();
+					String path = cursor.getString(column_index);
+					mImgPaths = path;
+
+					ContentResolver cr = this.getContentResolver();
+					bitmap = BitmapFactory.decodeStream(cr
+							.openInputStream(imgUri));
+
+					strCommentSmallImage = mUtils.BitmapToBase64BySize(mUtils
+							.zoomBitmap(bitmap, 200, 180));
+					strCommentLargeImage = mUtils.BitmapToBase64BySize(mUtils
+							.zoomBitmap(bitmap));
+					// 启动线程,将评论图片发送出去
+					Thread comment1 = new Thread(commentrun);
+					comment1.start();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (OutOfMemoryError e) {
+					CommonUtils.ShowToastCenter(this, "内存不足!",
+							Toast.LENGTH_LONG);
+				}
+			}
+		} else if (requestCode == 1) {
+			if (data == null) {
+				return;
+			}
+			try {
+				Uri uri = data.getData();
+				ContentResolver cr = this.getContentResolver();
+				String[] proj = { MediaStore.Images.Media.DATA };
+				@SuppressWarnings("deprecation")
+				Cursor cursor = managedQuery(uri, proj, null, null, null);
+				int column_index = cursor
+						.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+				cursor.moveToFirst();
+				String path = cursor.getString(column_index);
+				mImgPaths = path;
+				// 对图片进行旋转处理
+				bitmap = mUtils.PhotoRotation(uri);
+				strCommentSmallImage = mUtils.BitmapToBase64BySize(mUtils
+						.zoomBitmap(bitmap, 200, 180));
+				strCommentLargeImage = mUtils.BitmapToBase64BySize(mUtils
+						.zoomBitmap(bitmap));
+				// 启动线程,将评论图片发送出去
+				Thread comment1 = new Thread(commentrun);
+				comment1.start();
+			} catch (OutOfMemoryError e) {
+				CommonUtils.ShowToastCenter(this, "内存不足!", Toast.LENGTH_LONG);
+			}
+		} else if (requestCode == 2) {
+			if (data != null) {
+				int nRet = data.getExtras().getInt("nRet");
+				// 如果操作成功
+				if (1 == nRet) {
+					thanksbutton.setVisibility(View.GONE);
+				}
+			}
+		}
+	}
+
+	protected Dialog onCreateDialog(int id) {
+		AlertDialog dialog = null;
+		AlertDialog.Builder builder = null;
+		switch (id) {
+		case 0:
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("添加用户图片");
+			builder.setItems(addPhoto, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					if (which == 0) {
+						String haveSD = Environment.getExternalStorageState();
+						if (!haveSD.equals(Environment.MEDIA_MOUNTED)) {
+							Toast.makeText(ShareDynamicDetailActivity.this,
+									"存储卡不可用", Toast.LENGTH_LONG).show();
+							return;
+						}
+						File dir = new File(Environment
+								.getExternalStorageDirectory()
+								+ "/"
+								+ "carPhoto");
+						if (!dir.exists()) {
+							dir.mkdirs();
+						} else {// 如果已经存在了该文件夹
+							// 判断该文件夹中是否存在Car.jpg文件,如果存在则删除
+							String strPhotoPath = Environment
+									.getExternalStorageDirectory()
+									+ "/"
+									+ "carPhoto" + "/" + "Car.jpg";
+							File pPhotoFile = new File(strPhotoPath);
+							if (pPhotoFile.exists()) {
+								pPhotoFile.delete();
+							}
+						}
+						Intent intent = new Intent(
+								android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+						File imgFile = new File(dir, "Car.jpg");
+						Uri u = Uri.fromFile(imgFile);
+						intent.putExtra(MediaStore.Images.Media.ORIENTATION, 0);
+						intent.putExtra(MediaStore.EXTRA_OUTPUT, u);
+						startActivityForResult(intent, 0);
+					}
+					if (which == 1) {
+						Intent intent = new Intent(
+								"android.intent.action.GET_CONTENT");
+						intent.addCategory("android.intent.category.OPENABLE");
+						intent.setType("image/*");
+						ShareDynamicDetailActivity.this.startActivityForResult(
+								intent, 1);
+					}
+				}
+			});
+			dialog = builder.create();
+			break;
+
+		default:
+			break;
+		}
+		return dialog;
+	}
+
+	public void onDestroy() {
+		super.onDestroy();
+		mbIsContinue = false;
+		mthre = null;
+		run1 = null;
+	}
+
+	@Override
+	public void onBackPressed() {
+		mbIsContinue = false;
+		mthre = null;
+		finish();
+	}
+}

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    android:paddingLeft="40dp"
+    android:paddingRight="40dp"
+    android:paddingBottom="20dp">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"
+            android:src="@drawable/zan22" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp" >
+
+            <EditText
+                android:id="@+id/login_customername"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:drawableLeft="@drawable/customericon"
+                android:drawablePadding="15dp"
+                android:hint="@string/regedit_text" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <EditText
+                android:id="@+id/login_customerpassword"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
+                android:drawableLeft="@drawable/lockicon"
+                android:drawablePadding="15dp"
+                android:hint="@string/login_secret_text"
+                android:inputType="textPassword" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/login_button1"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/solid_blue"
+            android:text="@string/land_name"
+            android:textColor="#ffffff" 
+            android:textSize="18dp"
+            android:textStyle="bold"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/login_forgetpassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="忘记密码"
+            android:textColor="@color/d_grey"
+            android:textSize="16sp" 
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/login_newcustomer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/solid_grey0"
+            android:padding="6dp"
+            android:text="新用户"
+            android:textColor="@color/blue"
+            android:textSize="16dp" />
+    </RelativeLayout>
+
+</LinearLayout>

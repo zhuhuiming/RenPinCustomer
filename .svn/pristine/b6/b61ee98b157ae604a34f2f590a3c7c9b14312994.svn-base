@@ -1,0 +1,235 @@
+package com.renpin.renpincustomer;
+
+import com.renpin.domin.CustomerInfo;
+import com.renpin.service.GoodService;
+import com.renpin.service.Impl.GoodServiceImpl;
+import com.renpin.utils.CommonUtils;
+import com.umeng.analytics.MobclickAgent;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class MainActivity extends Activity {
+
+	// 用来存储用户信息
+	SharedPreferences msettings = null;
+	// 用户名编辑框
+	EditText logincustomername;
+	// 密码编辑框
+	EditText loginpassword;
+	// 新增用户按钮
+	TextView loginnewcustomer;
+	// 登录按钮
+	Button loginbutton;
+	// 存储登录的用户信息
+	public static CustomerInfo mcustomer;
+	private GoodService goodService = new GoodServiceImpl();
+	MyHandler myhandler;
+	// 进度条对象
+	public ProgressDialog m_ProgressDialog = null;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		// 程序启动的时候避免光标处在editview中而弹出输入法窗口
+		getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+		MobclickAgent.updateOnlineConfig(this);
+		MobclickAgent.openActivityDurationTrack(false);
+		//getDeviceInfo(this);
+		// String mCurrentPersonName = msettings.getString("TruePersonName",
+		// "");
+		// 如果没有登录过,进入登录界面
+		// if (mCurrentPersonName.equals("")) {
+		// Intent it = new Intent(MainActivity.this,
+		// StartLoginActivity.class);
+		// startActivity(it);
+		// setContentView(R.layout.login);
+		// myhandler = new MyHandler();
+		// msettings = getSharedPreferences("MekeSharedPreferences", 0);
+		// InitActivity();
+		// } else {// 如果登录了,那么就直接进入主界面
+		Intent it = new Intent(MainActivity.this, RenPinMainActivity.class);
+		startActivity(it);
+		finish();
+		// }
+	}
+
+	public static String getDeviceInfo(Context context) {
+		try {
+			org.json.JSONObject json = new org.json.JSONObject();
+			android.telephony.TelephonyManager tm = (android.telephony.TelephonyManager) context
+					.getSystemService(Context.TELEPHONY_SERVICE);
+
+			String device_id = tm.getDeviceId();
+
+			android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) context
+					.getSystemService(Context.WIFI_SERVICE);
+
+			String mac = wifi.getConnectionInfo().getMacAddress();
+			json.put("mac", mac);
+
+			if (TextUtils.isEmpty(device_id)) {
+				device_id = mac;
+			}
+
+			if (TextUtils.isEmpty(device_id)) {
+				device_id = android.provider.Settings.Secure.getString(
+						context.getContentResolver(),
+						android.provider.Settings.Secure.ANDROID_ID);
+			}
+
+			json.put("device_id", device_id);
+
+			return json.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private void InitActivity() {
+		logincustomername = (EditText) findViewById(R.id.login_customername);
+		loginpassword = (EditText) findViewById(R.id.login_customerpassword);
+		loginnewcustomer = (TextView) findViewById(R.id.login_newcustomer);
+		loginbutton = (Button) findViewById(R.id.login_button1);
+		// 点击新增用户
+		loginnewcustomer.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// 切换到注册界面
+				Intent it = new Intent(MainActivity.this,
+						StartRegeditActivity.class);
+				startActivity(it);
+			}
+		});
+
+		loginbutton.setOnClickListener(new OnClickListener() {
+
+			Runnable run1 = new Runnable() {
+				public void run() {
+					mcustomer = goodService.LogIn(logincustomername.getText()
+							.toString(), loginpassword.getText().toString());
+					Message msg = myhandler.obtainMessage();
+					if (null == mcustomer) {
+						msg.what = 1;
+					} else {
+						msg.what = 0;
+						Bundle b = new Bundle();// 存放数据
+						b.putString("sex", mcustomer.getsex());
+						b.putString("detail", mcustomer.getdetail());
+						b.putInt("age", mcustomer.getage());
+						b.putInt("score", mcustomer.getscore());
+						msg.setData(b);
+					}
+					myhandler.sendMessage(msg);
+				}
+			};
+
+			@Override
+			public void onClick(View v) {
+				String strTemp1 = logincustomername.getText().toString();
+				String strTemp2 = loginpassword.getText().toString();
+				if (strTemp1.isEmpty()) {
+					logincustomername.setSelection(0);
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"请输入账号", Toast.LENGTH_LONG);
+					return;
+				} else if (strTemp2.isEmpty()) {
+					loginpassword.setSelection(0);
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"请输入密码", Toast.LENGTH_LONG);
+					return;
+				}
+				m_ProgressDialog = ProgressDialog.show(MainActivity.this, "提示",
+						"正在登录,请等待...", true);
+				m_ProgressDialog.setCancelable(true);
+
+				Thread thread = new Thread(run1);
+				thread.start();
+			}
+		});
+	}
+
+	class MyHandler extends Handler {
+		// 子类必须重写此方法,接受数据
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+
+			if (m_ProgressDialog != null) {
+				m_ProgressDialog.dismiss();
+				m_ProgressDialog = null;
+			}
+			if (1 == msg.what) {
+				CommonUtils.ShowToastCenter(getApplicationContext(), "登录失败",
+						Toast.LENGTH_LONG);
+			} else {
+				CommonUtils.ShowToastCenter(getApplicationContext(), "登录成功",
+						Toast.LENGTH_LONG);
+
+				SharedPreferences.Editor editor = msettings.edit();
+				editor.putString("TruePersonName",
+						mcustomer.getstrCustomerName());
+				editor.putString("PersonName", mcustomer.getstrNickName());
+				// 将base64类型的图标保存起来
+				editor.putString("Base64Image", mcustomer.getstrIcon());
+				editor.putInt("CreditValue", mcustomer.getnCreditValue());
+				editor.putInt("CharmValue", mcustomer.getnCharmValue());
+				editor.putString("sex", mcustomer.getsex());
+				editor.commit();
+				// 判断空，我就不判断了。。。。
+				/*
+				 * Intent data = new Intent(); data.putExtra("personname",
+				 * mcustomer.getstrNickName()); data.putExtra("CreditValue",
+				 * mcustomer.getnCreditValue()); data.putExtra("CharmValue",
+				 * mcustomer.getnCharmValue()); // 请求代码可以自己设置，这里设置成20
+				 * setResult(20, data); // 关闭掉这个Activity finish();
+				 */
+				// 切换到主界面
+				Intent it = new Intent(MainActivity.this,
+						RenPinMainActivity.class);
+				startActivity(it);
+				finish();
+			}
+		}
+	}
+
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
+	@Override
+	public void onBackPressed() {
+		finish();
+	}
+
+	public void onResume() {
+		super.onResume();
+		MobclickAgent.onResume(this);
+	}
+
+	public void onPause() {
+		super.onPause();
+		MobclickAgent.onPause(this);
+	}
+
+}

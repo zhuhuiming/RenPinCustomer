@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="#f5f5f5">
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#F5F5F5"
+        android:orientation="vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ImageView
+                android:id="@+id/aboutus_returnimageview"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/left" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="#000000"
+                android:text="@string/aboutus"
+                android:textSize="18sp" />
+        </RelativeLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1e90ff"
+        android:orientation="horizontal" >
+    </LinearLayout>
+    <RelativeLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content">
+
+	   
+
+	    <ImageView
+	        android:layout_width="150dp"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentTop="true"
+	        android:layout_centerHorizontal="true"
+	        android:paddingLeft="20dip"
+	        android:paddingRight="20dip"
+	        android:scaleType="centerInside"
+	        android:src="@drawable/zan22" />
+
+    </RelativeLayout>
+    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	       android:layout_gravity="center"
+	        android:text="人们分享，因此变得亲密"
+	        
+	        android:textColor="@color/d_grey"
+	        android:textSize="13sp" />
+    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	       android:layout_gravity="center"
+	        android:text="　因你的出现，这个世界有些人的生活，微微的，哪怕那么一点儿，变得更好了。这是多么奇妙的事啊！"
+	        android:padding="25dp"
+	      android:layout_marginTop="30dp"
+	        android:textColor="@color/d_grey"
+	        android:textSize="15sp" />
+      <RelativeLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginBottom="20dp">
+	     <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_alignParentBottom="true" >
+    
+    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	       android:layout_gravity="center"
+	        android:text="米客科技创业团队(上海)"
+	        
+	        android:textColor="@color/d_grey"
+	        android:textSize="13sp" />
+     <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="QQ:285081422"
+	        	       android:layout_gravity="center"
+	        
+	        android:textColor="@color/d_grey"
+	        android:textSize="13sp" />
+    
+    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="sosence@hotmail.com"
+	        	       android:layout_gravity="center"
+	        
+	        android:textColor="@color/d_grey"
+	        android:textSize="13sp" />
+    </LinearLayout>
+    </RelativeLayout>
+    
+</LinearLayout>

@@ -1,0 +1,118 @@
+package com.renpin.mysqlite;
+
+import com.renpin.domin.TaskIcon;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+public class OperaDatabase {
+
+	SdCardDBHelper mdbHelper = null;
+	private Context mContext = null;
+
+	public OperaDatabase(Context context) {
+		if (mdbHelper != null) {
+			mdbHelper.close();
+			mdbHelper = null;
+		}
+		mContext = context;
+		DatabaseContext dbContext = new DatabaseContext(context);
+		mdbHelper = new SdCardDBHelper(dbContext);
+	}
+
+	public void CloseDatabase() {
+		if (mdbHelper != null) {
+			mdbHelper.close();
+			mdbHelper = null;
+		}
+	}
+
+	public Boolean InsertImage(int id, int ntype, String smallicon1,
+			String smallicon2, String smallicon3, String smallicon4,
+			String smallicon5, String smallicon6, String largeicon1,
+			String largeicon2, String largeicon3, String largeicon4,
+			String largeicon5, String largeicon6) {
+
+		Boolean bIsSucceed = false;
+		if (mdbHelper != null) {
+			SQLiteDatabase db = mdbHelper.getWritableDatabase();
+
+			ContentValues cv = new ContentValues();
+			cv.put("taskid", id);
+			cv.put("tasktype", ntype);
+			cv.put("SmallIcon1", smallicon1);
+			cv.put("SmallIcon2", smallicon2);
+			cv.put("SmallIcon3", smallicon3);
+			cv.put("SmallIcon4", smallicon4);
+			cv.put("SmallIcon5", smallicon5);
+			cv.put("SmallIcon6", smallicon6);
+			cv.put("LargeIcon1", largeicon1);
+			cv.put("LargeIcon2", largeicon2);
+			cv.put("LargeIcon3", largeicon3);
+			cv.put("LargeIcon4", largeicon4);
+			cv.put("LargeIcon5", largeicon5);
+			cv.put("LargeIcon6", largeicon6);
+
+			db.insert(SdCardDBHelper.TABLE_NAME, null, cv);
+		}
+		return bIsSucceed;
+	}
+
+	// 获取小图片
+	public TaskIcon GetSmallImage(String strTaskId, String strTaskType) {
+
+		TaskIcon taskicon = null;
+		if (mdbHelper != null) {
+			SQLiteDatabase db = mdbHelper.getReadableDatabase();
+			if (db != null) {
+				int nId = Integer.parseInt(strTaskId);
+				int nType = Integer.parseInt(strTaskType);
+				String strSQL = "SELECT * FROM ";
+				strSQL += SdCardDBHelper.TABLE_NAME;
+				strSQL += " where taskid = '";
+				strSQL += nId;
+				strSQL += "' and tasktype = '";
+				strSQL += nType;
+				strSQL += "'";
+				Cursor c = db.rawQuery(strSQL, null);
+				while (c.moveToNext()) {
+					taskicon = new TaskIcon(c.getString(3),c.getString(4), c.getString(5),
+							c.getString(6), c.getString(7), c.getString(8));
+					break;
+				}
+				c.close();
+			}
+		}
+		return taskicon;
+	}
+
+	// 获取大图片
+	public TaskIcon GetLargeImage(String strTaskId, String strTaskType) {
+
+		TaskIcon taskicon = null;
+		if (mdbHelper != null) {
+			SQLiteDatabase db = mdbHelper.getReadableDatabase();
+			if (db != null) {
+				int nId = Integer.parseInt(strTaskId);
+				int nType = Integer.parseInt(strTaskType);
+				String strSQL = "SELECT * FROM ";
+				strSQL += SdCardDBHelper.TABLE_NAME;
+				strSQL += " where taskid = '";
+				strSQL += nId;
+				strSQL += "' and tasktype = '";
+				strSQL += nType;
+				strSQL += "'";
+				Cursor c = db.rawQuery(strSQL, null);
+				while (c.moveToNext()) {
+					taskicon = new TaskIcon(c.getString(9),c.getString(10), c.getString(11),
+							c.getString(12), c.getString(13), c.getString(14));
+					break;
+				}
+				c.close();
+			}
+		}
+		return taskicon;
+	}
+}

@@ -1,0 +1,261 @@
+package com.renpin.renpincustomer;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.text.style.ImageSpan;
+import android.util.AttributeSet;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.SimpleAdapter;
+import android.widget.AdapterView.OnItemClickListener;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.Window;
+import android.view.View.OnFocusChangeListener;
+import android.view.ViewGroup.LayoutParams;
+
+public class ClearEditText extends EditText implements TextWatcher,
+		OnFocusChangeListener {
+
+	private Dialog builder;
+	private int[] imageIds = new int[107];
+	/**
+	 * 左右两侧图片资源
+	 */
+	private Drawable left;//, right;
+	/**
+	 * 是否获取焦点，默认没有焦点
+	 */
+	private boolean hasFocus = false;
+	/**
+	 * 手指抬起时的X坐标
+	 */
+	private int xUp = 0;
+
+	public ClearEditText(Context context) {
+		this(context, null);
+	}
+
+	public ClearEditText(Context context, AttributeSet attrs) {
+		this(context, attrs, android.R.attr.editTextStyle);
+	}
+
+	public ClearEditText(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		initWedgits(attrs);
+	}
+
+	/**
+	 * 初始化各组件
+	 * 
+	 * @param attrs
+	 *            属性集
+	 */
+	private void initWedgits(AttributeSet attrs) {
+		try {
+			left = getResources().getDrawable(R.drawable.happyface3);
+			// right = getCompoundDrawables()[2];
+			initDatas();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 初始化数据
+	 */
+	private void initDatas() {
+		try {
+			// 第一次显示，隐藏删除图标
+			// setCompoundDrawablesWithIntrinsicBounds(left, null, null, null);
+			addListeners();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 添加事件监听
+	 */
+	private void addListeners() {
+		try {
+			setOnFocusChangeListener(this);
+			addTextChangedListener(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int after) {
+		if (hasFocus) {
+			if (TextUtils.isEmpty(s)) {
+				// 如果为空，则不显示删除图标
+				// setCompoundDrawablesWithIntrinsicBounds(left, null, null,
+				// null);
+			} else {
+				// 如果非空，则要显示删除图标
+				// if (null == right) {
+				// right = getCompoundDrawables()[2];
+				// }
+				// setCompoundDrawablesWithIntrinsicBounds(left, null, right,
+				// null);
+			}
+		}
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		try {
+			switch (event.getAction()) {
+			case MotionEvent.ACTION_UP:
+				// 获取点击时手指抬起的X坐标
+				xUp = (int) event.getX();
+				// 当点击的坐标到当前输入框右侧的距离小于等于getCompoundPaddingRight()的距离时，则认为是点击了删除图标
+				// getCompoundPaddingRight()的说明：Returns the right padding of the
+				// view, plus space for the right Drawable if any.
+				if ((getWidth() - xUp) <= getCompoundPaddingRight()) {
+					// 程序启动的时候避免光标处在editview中而弹出输入法窗口
+					//if (!TextUtils.isEmpty(getText().toString())) {
+						createExpressionDialog();
+					//}
+				}
+				break;
+			default:
+				break;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return super.onTouchEvent(event);
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {
+	}
+
+	@Override
+	public void onFocusChange(View v, boolean hasFocus) {
+		try {
+			this.hasFocus = hasFocus;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 创建一个表情选择对话框
+	 */
+	private void createExpressionDialog() {
+		builder = new Dialog(this.getContext());
+		GridView gridView = createGridView();
+		builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		builder.setContentView(gridView);
+		builder.show();
+		gridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				Bitmap bitmap = null;
+				bitmap = BitmapFactory.decodeResource(getResources(),
+						imageIds[arg2 % imageIds.length]);
+				ImageSpan imageSpan = new ImageSpan(ClearEditText.this
+						.getContext(), bitmap);
+				String str = null;
+				if (arg2 < 10) {
+					str = "f00" + arg2;
+				} else if (arg2 < 100) {
+					str = "f0" + arg2;
+				} else {
+					str = "f" + arg2;
+				}
+				SpannableString spannableString = new SpannableString(str);
+				spannableString.setSpan(imageSpan, 0, 4,
+						Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				ClearEditText.this.append(spannableString);
+				builder.dismiss();
+			}
+		});
+	}
+
+	/**
+	 * 生成一个表情对话框中的gridview
+	 * 
+	 * @return
+	 */
+	private GridView createGridView() {
+		final GridView view = new GridView(this.getContext());
+		List<Map<String, Object>> listItems = new ArrayList<Map<String, Object>>();
+		// 生成107个表情的id，封装
+		for (int i = 0; i < 107; i++) {
+			try {
+				if (i < 10) {
+					Field field = R.drawable.class.getDeclaredField("f00" + i);
+					int resourceId = Integer.parseInt(field.get(null)
+							.toString());
+					imageIds[i] = resourceId;
+				} else if (i < 100) {
+					Field field = R.drawable.class.getDeclaredField("f0" + i);
+					int resourceId = Integer.parseInt(field.get(null)
+							.toString());
+					imageIds[i] = resourceId;
+				} else {
+					Field field = R.drawable.class.getDeclaredField("f" + i);
+					int resourceId = Integer.parseInt(field.get(null)
+							.toString());
+					imageIds[i] = resourceId;
+				}
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+			Map<String, Object> listItem = new HashMap<String, Object>();
+			listItem.put("image", imageIds[i]);
+			listItems.add(listItem);
+		}
+
+		SimpleAdapter simpleAdapter = new SimpleAdapter(
+				ClearEditText.this.getContext(), listItems,
+				R.layout.team_layout_single_expression_cell,
+				new String[] { "image" }, new int[] { R.id.image });
+		view.setAdapter(simpleAdapter);
+		view.setNumColumns(6);
+		view.setBackgroundColor(Color.rgb(214, 211, 214));
+		view.setHorizontalSpacing(1);
+		view.setVerticalSpacing(1);
+		view.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+				LayoutParams.WRAP_CONTENT));
+		view.setGravity(Gravity.CENTER);
+		return view;
+	}
+}

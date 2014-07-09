@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">RenPinCustomer</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <color name="grey21">#363636</color>
+
+    <string name="setting_text">设置</string>
+    <string name="return_text">返回</string>
+    <string name="near_text">周边</string>
+    <string name="square">广场</string>
+    <string name="task_input_text">请输入具体要求</string>
+    <string name="make_public">发布</string>
+    <string name="task_make_public">任务发布</string>
+    <string name="task_title">任务标题</string>
+    <string name="task_position">任务区域</string>
+    <string name="task_deadtime">有效时间</string>
+    <string name="task_confirm">任务确认</string>
+    <string name="get">拿下</string>
+    <string name="register_name">注册</string>
+    <string name="land_name">登录</string>
+    <string name="prompt_info">请点击右上角登录</string>
+    <string name="collection_name">收藏</string>
+    <string name="regedit_text">手机号/QQ/邮箱</string>
+    <string name="regedit_secret1_text">密码</string>
+    <string name="login_customer_text">用户名</string>
+    <string name="login_secret_text">密码</string>
+    <string name="regedit_secret2_text">密码确认</string>
+    <string name="more_down_text">更多</string>
+    <string name="update">版本更新</string>
+    <string name="mine">我的</string>
+    <string name="advice">意见反馈</string>
+    <string name="aboutus">关于我们</string>
+    <string name="set">设置</string>
+    <string name="advice_hint">谢谢您的反馈</string>
+    <string name="no_linkservice">无法连接到服务器，请检查网络</string>
+    <string name="confirm">确定</string>
+    <string name="finish">完成</string>
+    <string name="cancle">取消</string>
+    <string name="version">V1.0.0.8</string>
+    <string name="task_help">求助</string>
+    <string name="task_wellbeing">福利</string>
+    <string name="queue_name">排队</string>
+    <string name="get_confirm">确定拿下？</string>
+    <string name="fail">无效</string>
+    <string name="taskresult_send">执行结果告知</string>
+     <string name="taskresult_send_hint">请输入执行结果，获得对方确认后任务结束！</string>
+    <string name="thanksletter_hint">答谢信，默认为：您无私给了我很大的帮助，您的人品让我感动!</string>
+    <string name="thanksgift">答谢</string>
+    <string name="helpevaluation">赞人品</string>
+    <string name="send">发送</string>
+    <string name="talk_name">评论</string>
+    <string name="detail_content">详细内容：</string>
+    <string name="task_type">任务类型</string>
+    <string name="eachother_help">求助</string>
+    <string name="eachother_share">分享</string>
+    <string name="timer_hint">请设定任务的有效时间，时间超出有效时间后将自动无效</string>
+    <string name="thanksgift_hint">送点礼物意思意思吧！</string>
+    <string name="my_gift">我的礼物</string>
+    <string name="my_receive">我的接收</string>
+    <string name="my_public">我的发布</string>
+    <string name="my_info">个人信息</string>
+    <string name="makepublicarea_local">本地发布</string>
+    <string name="makepublicarea_choose">选择区域</string>
+    <string name="makepublicarea_none">无区域限制</string>
+    <string name="makepublicarea">请选择发布区域</string>
+    <string name="more">更多</string>
+    <string name="loading">正在加载</string>
+    <string name="noMoreRecord">没有更多的记录了</string>
+    <string name="leaveout">退出登陆</string>
+    <string name="resend">重发</string>
+
+    <!-- 界面菜单栏 -->
+    <string name="dynamic_state_text">我的</string>
+    <string name="near_state_text">求助</string>
+    <string name="space_state_text">分享</string>
+    <string name="more_state_text">更多</string>
+
+    <!-- 注册界面 -->
+    <string name="finish_text">完成</string>
+
+    <!-- 时间限制界面 -->
+    <string name="day_text">天</string>
+    <string name="hour_text">小时</string>
+    <string name="minute_text">分</string>
+    <string name="second_text">秒</string>
+    <string name="sure_text">确定</string>
+
+    <!-- 任务状态提示界面 -->
+    <string name="task_text1">1、发布求助</string>
+    <string name="task_text5">2、</string>
+    <string name="task_text2">正在执行任务</string>
+    <string name="task_text3">3、帮助完成,等待验证</string>
+    <string name="task_text4">4、已经通过验证</string>
+    
+    <string name="pull_to_refresh_pull_label">下拉刷新</string>
+    <string name="pull_to_refresh_release_label">松开后刷新</string>
+    <string name="pull_to_refresh_refreshing_label">刷新\u2026</string>
+    
+    <string name="pull_to_refresh_footer_release_label">松开后加载</string>
+    <string name="pull_to_refresh_footer_pull_label">上拉加载更多</string>
+    <string name="pull_to_refresh_footer_refreshing_label">加载中\u2026</string>
+    <string name="text">http://miloisbadboy.com/</string>
+    <string name="no_content">没有内容</string>
+
+</resources>

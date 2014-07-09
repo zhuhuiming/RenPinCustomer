@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.renpin.renpincustomer"
+    android:versionCode="27"
+    android:versionName="2.0.1.6" >
+
+    <uses-sdk
+        android:minSdkVersion="12"
+        android:targetSdkVersion="19" />
+
+    <application
+        android:name="com.renpin.location.MyApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/zan"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.renpin.renpincustomer.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppStartLoad"
+            android:windowSoftInputMode="stateHidden|adjustResize" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.RenPinMainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity android:name="com.renpin.renpincustomer.LoginActivity" >
+        </activity>
+        <activity android:name="com.renpin.renpincustomer.MoreOperaActivity" >
+        </activity>
+        <activity android:name="com.renpin.renpincustomer.MyOperaActivity" >
+        </activity>
+        <activity android:name="com.renpin.renpincustomer.RegeditActivity" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.TaskAnnounceActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" >
+        </activity>
+        <activity android:name="com.renpin.renpincustomer.TaskDetailActivity" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.DynamicDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.ShareDynamicDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" >
+        </activity>
+        <activity android:name="com.renpin.renpincustomer.TaskImplementFinishOperaActivity" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.TaskAnnounceVertifOperaActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.ViewPagerActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.ShareViewPagerActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.TaskFinishOrVertifiImage"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.TaskDetailViewPagerActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.CommentActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+        </activity>
+        <activity android:name="com.renpin.renpincustomer.AdviceActivity" >
+        </activity>
+        <activity android:name="com.renpin.renpincustomer.AboutUsActivity" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.StartRegeditActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.RegeditNextActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.MyInfoActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.TaskDetailShowLargeImageActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.renpin.renpincustomer.wxapi.WXEntryActivity"
+            android:exported="true"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.tencent.connect.common.AssistActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent101113055" /> <!-- 100380359 100381104 222222 -->
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.renpin.qq.BaseActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.renpin.renpincustomer.ShareKingActivity"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" >
+        </service>
+
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="0UiStD3AGWy2GSPeW91hpBqA" />
+
+        <service android:name="com.renpin.myservice.UpdateDataService" >
+            <intent-filter>
+                <action android:name="com.renpin.myservice.UpdateDataService" />
+
+                <category android:name="android.intent.category.default" />
+            </intent-filter>
+        </service>
+        <service android:name="com.renpin.versionupdate.UpdateService" >
+        </service>
+
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="53b0381756240bbc96134540" >
+        </meta-data>
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="zhuhuiming" />
+    </application>
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+
+    <permission android:name="android.permission.BAIDU_LOCATION_SERVICE" >
+    </permission>
+
+    <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" >
+    </uses-permission>
+    <!-- <uses-permission android:name="android.permission.WRITE_APN_SETTINGS"></uses-permission> -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" >
+    </uses-permission>
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_GPS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <!-- SDK1.5需要android.permission.GET_TASKS权限判断本程序是否为当前运行的应用? -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.CAMERA" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="false"
+        android:resizeable="true"
+        android:smallScreens="true" />
+
+</manifest>

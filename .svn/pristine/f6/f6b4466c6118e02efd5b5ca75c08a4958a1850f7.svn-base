@@ -1,0 +1,162 @@
+package com.renpin.renpincustomer;
+import com.renpin.service.GoodService;
+import com.renpin.service.Impl.GoodServiceImpl;
+import com.renpin.utils.CommonUtils;
+
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+public class ShareKingActivity extends Activity {
+
+	// 达人头像控件
+	ImageView personimageview;
+	// 达人昵称
+	TextView personnicknametextview;
+	// 人品值控件
+	TextView creditvaluetextview;
+	// 赞值控件
+	TextView charmvaluetextview;
+	// 分享次数控件
+	TextView sharetimes;
+	// 达人日期控件
+	TextView datetextview;
+
+	// 达人名称
+	String strPersonTrueName;
+	// 达人昵称
+	String strPersonNickName;
+	// 达人头像
+	String strPersonImage;
+	// 时间
+	String strDate;
+	// 分享次数
+	String strShareTime;
+	// 人品值
+	String strCreditValue;
+	// 赞值
+	String strCharmValue;
+	//返回控件
+	ImageView returnimageview;
+	
+	MyHandler myhandler;
+
+	private static CommonUtils mUtils = null;
+
+	// 注册按钮
+	TextView textview1;
+	private GoodService goodService = new GoodServiceImpl();
+	SharedPreferences msettings = null;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		// 程序启动的时候避免光标处在editview中而弹出输入法窗口
+		getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+		setContentView(R.layout.shareking);
+
+		// 创建接收消息对象
+		myhandler = new MyHandler();
+
+		if (null == mUtils) {
+			// 创建公共操作类对象
+			mUtils = new CommonUtils(this);
+		}
+		// 达人名称
+		strPersonTrueName = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.customername");
+		strPersonNickName = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.strCustomerNameTemp");
+		strPersonImage = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.mAnnounceImage");
+		strDate = (String) getIntent().getStringExtra(
+				"com.renpin.RenPinMainActivity.strAddressRegion");
+		strShareTime = (int) getIntent().getIntExtra(
+				"com.renpin.RenPinMainActivity.nCommentNum", 0)
+				+ "";
+		// 初始化视图
+		InitActivities();
+		// 显示赞值和人品值
+		ShowCharmAndCreditValue();
+		msettings = getSharedPreferences("MekeSharedPreferences", 0);
+	}
+
+	private void InitActivities() {
+		personimageview = (ImageView) findViewById(R.id.shareking_personimageview);
+		personimageview.setImageBitmap(mUtils.base64ToBitmap(strPersonImage));
+		personnicknametextview = (TextView) findViewById(R.id.shareking_personnickname);
+		personnicknametextview.setText(strPersonNickName);
+		creditvaluetextview = (TextView) findViewById(R.id.shareking_credittextview);
+		creditvaluetextview.setText("0");
+		charmvaluetextview = (TextView) findViewById(R.id.shareking_charmtextview);
+		charmvaluetextview.setText("0");
+		sharetimes = (TextView) findViewById(R.id.shareking_sharetimetextview);
+		sharetimes.setText(strShareTime);
+		datetextview = (TextView) findViewById(R.id.shareking_datetextview);
+		datetextview.setText(strDate);
+		returnimageview = (ImageView)findViewById(R.id.shareking_returnimageview);
+		
+		returnimageview.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
+	}
+
+	private void ShowCharmAndCreditValue() {
+		Runnable run2 = new Runnable() {
+			public void run() {
+
+				int nCreditValue = 0;
+				int nCharmValue = 0;
+				if (!strPersonTrueName.equals("")) {
+					// 根据人名称获取相应的人品值和赞值
+					nCreditValue = goodService
+							.GetCreditValue(strPersonTrueName);
+					nCharmValue = goodService.GetCharmValue(strPersonTrueName);
+					strCreditValue = nCreditValue + "";
+					strCharmValue = nCharmValue + "";
+				}
+
+				Message msg = myhandler.obtainMessage();
+				msg.what = 0;
+				myhandler.sendMessage(msg);
+			}
+		};
+		// 启动获取评论数据线程
+		Thread thread = new Thread(run2);
+		thread.start();
+	}
+
+	class MyHandler extends Handler {
+		// 子类必须重写此方法,接受数据
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			switch (msg.what) {
+			case 0:
+				creditvaluetextview.setText(strCreditValue);
+				charmvaluetextview.setText(strCharmValue);
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		finish();
+	}
+}

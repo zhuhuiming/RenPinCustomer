@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#F5F5F5"
+        android:orientation="vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ImageView
+                android:id="@+id/customer_login_image1"
+                android:layout_width="30dp"
+                android:layout_height="22dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/left" />
+
+            <TextView
+                android:id="@+id/customer_login_textview1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/dynamic_state_text"
+                android:textColor="@color/d_grey"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/mytask_resendbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/solid_grey0"
+                android:text="@string/resend"
+                android:textColor="@color/blue"
+                android:textSize="13dp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1e90ff"
+        android:orientation="horizontal" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <ScrollView
+            android:id="@+id/mytask_scrollview"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ffffff"
+                    android:orientation="vertical"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="15dp" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="16dp" >
+
+                        <TextView
+                            android:id="@+id/mytask_textview17"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="【分享】"
+                            android:textColor="@color/red"
+                            android:textSize="15dp" />
+
+                        <TextView
+                            android:id="@+id/mytask_textview5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawableRight="@drawable/makepublic1"
+                            android:text="jfdsajlaljdklajklajkldjksa发的反反复复反反复复凤飞飞"
+                            android:textColor="@color/d_grey"
+                            android:textSize="15dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="#f5f5f5"
+                        android:orientation="horizontal" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/mytask_imageview1"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/noperson" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="18dp"
+                            android:orientation="vertical" >
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="5dp" >
+
+                                <TextView
+                                    android:id="@+id/mytask_textview1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="sosence"
+                                    android:textColor="@color/blue"
+                                    android:textSize="13dp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/solid_grey0"
+                                android:orientation="horizontal"
+                                android:paddingBottom="3dp"
+                                android:paddingLeft="5dp"
+                                android:paddingRight="8dp"
+                                android:paddingTop="3dp" >
+
+                                <TextView
+                                    android:id="@+id/mytask_credittextview"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:textColor="#FA8072"
+                                    android:textSize="13dp"
+                                    android:textStyle="bold" />
+
+                                <ImageView
+                                    android:id="@+id/more_opera_imageview2"
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:layout_marginLeft="10dp"
+                                    android:src="@drawable/zan1" />
+
+                                <TextView
+                                    android:id="@+id/mytask_charmtextview"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="5dp"
+                                    android:textColor="#FA8072"
+                                    android:textSize="13dp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/mytask_textview2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="6dp"
+                                android:text="time"
+                                android:textColor="@color/grey"
+                                android:textSize="11dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal" >
+
+                        <TextView
+                            android:id="@+id/mytask_addresstextview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawableLeft="@drawable/location"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:text="address"
+                            android:textColor="@color/grey"
+                            android:textSize="11dp" />
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <TextView
+                                android:id="@+id/mytask_textview4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:drawableLeft="@drawable/timer"
+                                android:textColor="@color/lightgrey"
+                                android:textSize="13dp"
+                                android:visibility="gone" />
+                        </RelativeLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.5dip"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="#f5f5f5" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:visibility="gone" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:paddingTop="15dp" >
+
+                        <Button
+                            android:id="@+id/mytask_thanksbutton"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:background="@drawable/solid_blue"
+                            android:text="@string/thanksgift"
+                            android:textColor="#ffffff"
+                            android:textSize="13dp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.5" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:paddingTop="15dp" >
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/frame_grey"
+                    android:orientation="vertical"
+                    android:padding="8dp"
+                    android:visibility="gone" >
+
+                    <TextView
+                        android:id="@+id/mytask_endinfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingBottom="8dp"
+                        android:paddingTop="8dp"
+                        android:textColor="@color/red"
+                        android:textSize="13dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="10dp" >
+
+                        <ImageView
+                            android:id="@+id/mytask_imageview10"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:scaleType="centerCrop" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ffffff"
+                    android:orientation="vertical"
+                    android:padding="6dp" >
+
+                    <TextView
+                        android:id="@+id/mytask_textview_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#ffffff"
+                        android:lineSpacingMultiplier="1.2"
+                        android:padding="6dp"
+                        android:textColor="@color/d_grey"
+                        android:textSize="15dp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/mytask_textview6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#ffffff"
+                        android:drawableRight="@drawable/makepublic1"
+                        android:gravity="center_vertical"
+                        android:lineSpacingMultiplier="1.2"
+                        android:paddingLeft="6dp"
+                        android:paddingTop="6dp"
+                        android:text="1111鹅鹅鹅鹅鹅鹅鹅鹅鹅鹅鹅鹅鹅鹅鹅饿鹅鹅鹅鹅鹅鹅饿鹅鹅鹅"
+                        android:textColor="@color/grey"
+                        android:textSize="13dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:paddingTop="6dp" >
+
+                        <LinearLayout
+                            android:id="@+id/mytask_smallicons1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal" >
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal" >
+
+                                <ImageView
+                                    android:id="@+id/mytask_icon1"
+                                    android:layout_width="100dp"
+                                    android:layout_height="90dp"
+                                    android:background="#f5f5f5"
+                                    android:scaleType="centerCrop" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:paddingLeft="3dp" >
+
+                                <ImageView
+                                    android:id="@+id/mytask_icon2"
+                                    android:layout_width="100dp"
+                                    android:layout_height="90dp"
+                                    android:background="#f5f5f5"
+                                    android:scaleType="centerCrop" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:paddingLeft="3dp" >
+
+                                <ImageView
+                                    android:id="@+id/mytask_icon3"
+                                    android:layout_width="100dp"
+                                    android:layout_height="90dp"
+                                    android:background="#f5f5f5"
+                                    android:scaleType="centerCrop" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/mytask_smallicons2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingBottom="10dp"
+                            android:paddingTop="6dp" >
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal" >
+
+                                <ImageView
+                                    android:id="@+id/mytask_icon4"
+                                    android:layout_width="100dp"
+                                    android:layout_height="90dp"
+                                    android:background="#f5f5f5"
+                                    android:scaleType="centerCrop" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:paddingLeft="3dp" >
+
+                                <ImageView
+                                    android:id="@+id/mytask_icon5"
+                                    android:layout_width="100dp"
+                                    android:layout_height="90dp"
+                                    android:background="#f5f5f5"
+                                    android:scaleType="centerCrop" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:paddingLeft="3dp" >
+
+                                <ImageView
+                                    android:id="@+id/mytask_icon6"
+                                    android:layout_width="100dp"
+                                    android:layout_height="90dp"
+                                    android:background="#f5f5f5"
+                                    android:scaleType="centerCrop" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ffffff"
+                    android:orientation="vertical"
+                    android:padding="6dp"
+                    android:visibility="gone" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/solid_grey"
+                        android:orientation="vertical"
+                        android:padding="8dp" >
+
+                        <TextView
+                            android:id="@+id/mytask_textviewthanksfrom"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="来自sosence的答谢"
+                            android:textColor="@color/red"
+                            android:textSize="13dp" />
+
+                        <TextView
+                            android:id="@+id/mytask_textview16"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="13dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingTop="10dp" >
+
+                            <ImageView
+                                android:id="@+id/mytask_imageview10"
+                                android:layout_width="100dp"
+                                android:layout_height="wrap_content"
+                                android:scaleType="centerCrop" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.8dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="15dp"
+                    android:background="#F5f5f5" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal"
+                    android:paddingLeft="10dp"
+                    android:visibility="gone" >
+
+                    <ImageView
+                        android:id="@+id/mytask_imageview3"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/talk" />
+
+                    <ImageView
+                        android:id="@+id/mytask_imageview4"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="top" />
+
+                    <TextView
+                        android:id="@+id/mytask_textview9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:textColor="@color/grey" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="#ffffff"
+                    android:orientation="horizontal" >
+
+                    <LinearLayout
+                        android:id="@+id/mytask_zanimageviewlayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/mytask_zanimageview"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/zan0" />
+
+                        <TextView
+                            android:id="@+id/mytask_zantextview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:paddingLeft="8dp"
+                            android:text="3"
+                            android:textColor="@color/grey"
+                            android:textSize="13dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="0.5dp"
+                        android:layout_height="match_parent"
+                        android:background="#F5f5f5"
+                        android:orientation="vertical" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/mytask_talkimageview"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/talk0" />
+
+                        <ImageView
+                            android:id="@+id/mytask_talkpromptimageview"
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_gravity="left|top" />
+
+                        <TextView
+                            android:id="@+id/mytask_talknumtextview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:paddingLeft="8dp"
+                            android:text="0"
+                            android:textColor="@color/grey"
+                            android:textSize="13dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="0.5dp"
+                        android:layout_height="match_parent"
+                        android:background="#f5f5f5"
+                        android:orientation="vertical" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/look" />
+
+                        <TextView
+                            android:id="@+id/mytask_looktimetextview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:paddingLeft="8dp"
+                            android:text="3"
+                            android:textColor="@color/grey"
+                            android:textSize="13dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/mytask_linearlayout1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_weight="1"
+                    android:cacheColorHint="#00000000"
+                    android:orientation="vertical"
+                    android:padding="5dp" >
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.1dip"
+        android:background="@color/l_lightgrey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#f5f5f5"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="5dp" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="7"
+            android:gravity="center" >
+
+            <ImageView
+                android:id="@+id/mytask_sendpicture"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/add0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2.5" >
+
+            <com.renpin.renpincustomer.ClearEditText
+                android:id="@+id/my_task_edittext1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableRight="@drawable/happyface3"
+                android:hint="@string/talk_name" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="6.5"
+            android:gravity="center" >
+
+            <Button
+                android:id="@+id/my_task_button1"
+                android:layout_width="45dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="3dp"
+                android:background="@drawable/frame_grey0"
+                android:drawableStart="@drawable/send0"
+                android:textColor="#ffffff"
+                android:textSize="15dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

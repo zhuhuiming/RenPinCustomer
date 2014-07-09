@@ -1,0 +1,17 @@
+package com.renpin.myservice;
+
+import java.util.List;
+
+import com.renpin.domin.TaskDynamicNew;
+import com.renpin.domin.TaskInfo;
+
+public interface ITaskPersonData {
+	// 存储所有发布信息数据
+	public abstract List<TaskInfo> GetTaskInfos();
+	// 存储未拿下的数据
+	public abstract List<TaskInfo> GetNoSelectTaskInfos();
+	// 存储动态信息
+	public abstract List<TaskDynamicNew> GetTaskDynamicNews();
+	//获取是否需要更新数据的标志
+	public abstract int GetUpdateSignal();
+}

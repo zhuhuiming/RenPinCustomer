@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#9fffffff"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ImageView
+                android:id="@+id/customer_login_image1"
+                android:layout_width="50dp"
+                android:layout_height="22dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingRight="25dp"
+                android:src="@drawable/left" />
+
+            <TextView
+                android:id="@+id/customer_login_textview1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/task_make_public"
+                android:textColor="@color/d_grey"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:id="@+id/makepublic_addimageview"
+                android:layout_width="50dp"
+                android:layout_height="28dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:paddingLeft="10dp"
+                android:src="@drawable/add" 
+                android:visibility="gone"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="50dp"
+                        android:orientation="vertical"
+                        android:padding="10dp" >
+
+                        <EditText
+                            android:id="@+id/makepublic_EditText1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="@drawable/frame_none"
+                            android:gravity="center"
+                            android:hint="请输入标题"
+                            android:textColor="@color/d_grey"
+                            android:textSize="22dp" />
+
+                        <EditText
+                            android:id="@+id/makepublic_edittext3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="50dp"
+                            android:background="@drawable/frame_none"
+                            android:drawableLeft="@drawable/makepublic0"
+                            android:hint="内容补充"
+                            android:textColor="@color/grey"
+                            android:textColorHint="@color/lightgrey" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="30dp"
+                            android:gravity="center"
+                            android:orientation="horizontal" >
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="horizontal" >
+
+                                <RadioButton
+                                    android:id="@+id/hotel_order_radiobutton1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:background="@drawable/solid_grey0"
+                                    android:paddingLeft="8sp"
+                                    android:paddingRight="8sp"
+                                    android:text="@string/eachother_help"
+                                    android:textColor="@color/red"
+                                    android:textSize="15dp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="horizontal" >
+
+                                <RadioButton
+                                    android:id="@+id/hotel_order_radiobutton2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:background="@drawable/solid_grey0"
+                                    android:gravity="center"
+                                    android:paddingLeft="8sp"
+                                    android:paddingRight="8sp"
+                                    android:text="@string/eachother_share"
+                                    android:textColor="@color/red"
+                                    android:textSize="15dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+
+                            <TextView
+                                android:id="@+id/makepublic_textview1"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:background="@drawable/frame_none"
+                                android:gravity="center"
+                                android:hint="默认为1小时"
+                                android:textSize="13dp"
+                                android:visibility="gone" />
+
+                            <EditText
+                                android:id="@+id/makepublic_EditText2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="50dp"
+                                android:background="@drawable/frame_none"
+                                android:drawableLeft="@drawable/location"
+                                android:gravity="center"
+                                android:hint="默认为本地"
+                                android:textColor="@color/grey"
+                                android:textSize="13dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="95dp"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal"
+                    android:padding="8dp" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/makepublic_imageview1"
+                            android:layout_width="100dp"
+                            android:layout_height="90dp"
+                            android:background="#f5f5f5"
+                            android:scaleType="centerCrop" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/makepublic_imageview2"
+                            android:layout_width="100dp"
+                            android:layout_height="90dp"
+                            android:background="#f5f5f5"
+                            android:scaleType="centerCrop" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/makepublic_imageview3"
+                            android:layout_width="100dp"
+                            android:layout_height="90dp"
+                            android:background="#f5f5f5"
+                            android:scaleType="centerCrop" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="95dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:padding="8dp" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/makepublic_imageview4"
+                            android:layout_width="100dp"
+                            android:layout_height="90dp"
+                            android:background="#f5f5f5"
+                            android:scaleType="centerCrop" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/makepublic_imageview5"
+                            android:layout_width="100dp"
+                            android:layout_height="90dp"
+                            android:background="#f5f5f5"
+                            android:scaleType="centerCrop" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:id="@+id/makepublic_imageview6"
+                            android:layout_width="100dp"
+                            android:layout_height="90dp"
+                            android:background="#f5f5f5"
+                            android:scaleType="centerCrop" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#00ffffff"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="5dp" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/makepublic_button1"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/solid_blue"
+                android:text="@string/make_public"
+                android:textColor="#ffffff"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="3"
+            android:gravity="center" >
+
+            <ImageView
+                android:id="@+id/makepublic_imageview7"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:src="@drawable/photo" />
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/add0"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

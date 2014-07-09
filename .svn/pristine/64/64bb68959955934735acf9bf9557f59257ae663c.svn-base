@@ -1,0 +1,57 @@
+package com.renpin.renpincustomer;
+
+import com.renpin.location.MySearch;
+import com.renpin.renpincustomer.TaskAnnounceActivity.MyHandler;
+import com.renpin.utils.CommonUtils;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+
+public class AddCreditActivity extends Activity {
+	// 填入人品值得编辑框
+	private EditText creditedittext;
+	// 设置人品值限制的按钮
+	private Button creditbutton;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+		// 程序启动的时候避免光标处在editview中而弹出输入法窗口
+		getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+		setContentView(R.layout.credit_setting);
+		// 控件初始化
+		InitActivities();
+	}
+
+	private void InitActivities() {
+		creditedittext = (EditText) findViewById(R.id.credit_setting_valueedittext);
+		creditbutton = (Button) findViewById(R.id.credit_setting_valuebutton);
+        creditedittext.setText("1");
+		creditbutton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent data = new Intent();
+				String str = creditedittext.getText().toString();
+				data.putExtra("CreditValue", creditedittext.getText().toString());
+				// 请求代码可以自己设置，这里设置成2
+				setResult(2, data);
+				// 关闭掉这个Activity
+				finish();
+			}
+
+		});
+	}
+}

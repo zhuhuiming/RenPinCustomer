@@ -1,0 +1,68 @@
+package com.renpin.mysqlite;
+
+import android.content.Context;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+public class SdCardDBHelper extends SQLiteOpenHelper {
+	
+	public static final String TAG = "SdCardDBHelper";
+	public static final String TABLE_NAME = "mytaskpicture";
+	/**
+	 * 数据库名称
+	 **/
+	public static String DATABASE_NAME = "renpin.db";
+
+	/**
+	 * 数据库版本
+	 **/
+	public static int DATABASE_VERSION = 1;
+
+	/**
+	 * 构造函数
+	 * 
+	 * @param context
+	 *            上下文环境
+	 **/
+	public SdCardDBHelper(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+	}
+
+	/**
+	 * 创建数据库时触发，创建离线存储所需要的数据库表
+	 * 
+	 * @param db
+	 **/
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		Log.e(TAG, "开始创建数据库表");
+		try {
+			// 创建图片的表
+			db.execSQL("create table if not exists " + TABLE_NAME
+					+ "(_id integer primary key autoincrement,taskid integer(10),"
+					+ "tasktype integer(3),SmallIcon1 MEDIUMTEXT,"
+					+ "SmallIcon2 MEDIUMTEXT,SmallIcon3 MEDIUMTEXT,SmallIcon4 MEDIUMTEXT,"
+					+ "SmallIcon5 MEDIUMTEXT,SmallIcon6 MEDIUMTEXT,LargeIcon1 MEDIUMTEXT,"
+					+ "LargeIcon2 MEDIUMTEXT,LargeIcon3 MEDIUMTEXT,LargeIcon4 MEDIUMTEXT,"
+					+ "LargeIcon5 MEDIUMTEXT,LargeIcon6 MEDIUMTEXT)");
+			Log.e(TAG, "创建离线所需数据库表成功");
+		} catch (SQLException se) {
+			se.printStackTrace();
+			Log.e(TAG, "创建离线所需数据库表失败");
+		}
+	}
+
+	/**
+	 * 更新数据库时触发，
+	 * 
+	 * @param db
+	 * @param oldVersion
+	 * @param newVersion
+	 **/
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		// db.execSQL("ALTER TABLE person ADD COLUMN other STRING");
+	}
+}

@@ -1,0 +1,324 @@
+package com.renpin.renpincustomer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import com.renpin.service.GoodService;
+import com.renpin.service.Impl.GoodServiceImpl;
+import com.renpin.utils.CommonUtils;
+
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+public class RegeditActivity extends Activity {
+
+	ImageView image1;
+	Button button1;
+	EditText edittext1;
+	EditText edittext2;
+	EditText edittext3;
+	EditText edittext4;
+	// 用户图标
+	ImageView image3;
+	MyHandler myhandler;
+	private GoodService goodService = new GoodServiceImpl();
+	public static final String[] addPhoto = new String[] { "现在拍摄", "从相册选择",
+			"取消" };
+	private static CommonUtils mUtils = null;
+	// 保存所选图片的路径
+	private String mImgPaths = "";
+	// 进度条对象
+	public static ProgressDialog m_ProgressDialog = null;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		// 程序启动的时候避免光标处在editview中而弹出输入法窗口
+		getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+		setContentView(R.layout.activity_regedit);
+		mImgPaths = "";
+		mUtils = new CommonUtils(this);
+		InitActivities();
+		myhandler = new MyHandler();
+	}
+
+	class MyHandler extends Handler {
+		// 子类必须重写此方法,接受数据
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+
+			if (m_ProgressDialog != null) {
+				m_ProgressDialog.dismiss();
+				m_ProgressDialog = null;
+			}
+			if (0 == msg.what) {
+				Toast.makeText(getApplicationContext(), "注册成功",
+						Toast.LENGTH_LONG).show();
+				finish();
+			} else if (2 == msg.what) {
+				Toast.makeText(getApplicationContext(), "已经存在该账号，请选择其他账号",
+						Toast.LENGTH_LONG).show();
+			} else {
+				Toast.makeText(getApplicationContext(), "注册失败",
+						Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+
+	private void InitActivities() {
+		image1 = (ImageView) findViewById(R.id.customer_regedit_image1);
+		image3 = (ImageView) findViewById(R.id.customer_regedit_image3);
+		button1 = (Button) findViewById(R.id.customer_regedit_button1);
+		edittext1 = (EditText) findViewById(R.id.customer_regedit_edit1);
+		edittext2 = (EditText) findViewById(R.id.customer_regedit_edit2);
+		edittext3 = (EditText) findViewById(R.id.customer_regedit_edit3);
+		edittext4 = (EditText) findViewById(R.id.customer_regedit_nickname);
+
+		image1.setOnClickListener(new ImageView.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+
+		});
+
+		image3.setOnClickListener(new ImageView.OnClickListener() {
+
+			@SuppressWarnings("deprecation")
+			@Override
+			public void onClick(View v) {
+				showDialog(0);
+			}
+
+		});
+
+		button1.setOnClickListener(new Button.OnClickListener() {
+			// 将图片数据转换成base64型
+			String strImageBase64;
+
+			Runnable run1 = new Runnable() {
+				public void run() {
+					// 开始注册用户
+					int nRetType = goodService.RegisterCustomer(strImageBase64,
+							edittext1.getText().toString(), edittext2.getText()
+									.toString(), "1", "0", edittext4.getText()
+									.toString(),"");
+					Message msg = new Message();
+					msg.what = nRetType;
+					myhandler.sendMessage(msg);
+				}
+			};
+
+			@Override
+			public void onClick(View v) {
+
+				String strTemp1 = edittext1.getText().toString();
+				String strTemp2 = edittext2.getText().toString();
+				String strTemp3 = edittext3.getText().toString();
+				String strTemp4 = edittext4.getText().toString();
+				if (strTemp1.isEmpty()) {
+					edittext1.setSelection(0);
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"请输入账号", Toast.LENGTH_LONG);
+					return;
+				} else if (strTemp2.isEmpty()) {
+					edittext2.setSelection(0);
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"请输入密码", Toast.LENGTH_LONG);
+					return;
+				} else if (strTemp3.isEmpty()) {
+					edittext3.setSelection(0);
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"请输入确认密码", Toast.LENGTH_LONG);
+					return;
+				} else if (!strTemp2.equals(strTemp3)) {
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"确认密码输入错误,请检查", Toast.LENGTH_LONG);
+					return;
+				} else if(strTemp4.equals("")){
+					CommonUtils.ShowToastCenter(getApplicationContext(),
+							"昵称不能为空", Toast.LENGTH_LONG);
+					return;
+				}else {
+					m_ProgressDialog = ProgressDialog.show(
+							RegeditActivity.this, "提示", "正在登录,请等待...", true);
+					m_ProgressDialog.setCancelable(true);
+					if (mImgPaths.equals("")) {
+						strImageBase64 = "";
+					} else {
+						strImageBase64 = mUtils.imgToBase64(mImgPaths, 70, 70);
+					}
+					Thread thread = new Thread(run1);
+					thread.start();
+				}
+			}
+
+		});
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		Bitmap bitmap = null;
+
+		// if (resultCode == RESULT_OK)
+		{
+			if (requestCode == 0) {
+				String strImagePath = Environment.getExternalStorageDirectory()
+						+ "/" + "carPhoto" + "/" + "Car.jpg";
+				// 先判断该文件是否存在
+				File pImageFile = new File(strImagePath);
+				if (pImageFile.exists()) {
+					// 对图片进行旋转处理
+					mUtils.rotatePhoto(strImagePath);
+
+					File imgFile = new File(strImagePath);
+					try {
+						Uri imgUri = Uri
+								.parse(android.provider.MediaStore.Images.Media
+										.insertImage(getContentResolver(),
+												imgFile.getAbsolutePath(),
+												null, null));
+						String[] proj = { MediaStore.Images.Media.DATA };
+						@SuppressWarnings("deprecation")
+						Cursor cursor = managedQuery(imgUri, proj, null, null,
+								null);
+						int column_index = cursor
+								.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+						cursor.moveToFirst();
+						String path = cursor.getString(column_index);
+						mImgPaths = path;
+
+						ContentResolver cr = this.getContentResolver();
+						bitmap = BitmapFactory.decodeStream(cr
+								.openInputStream(imgUri));
+						bitmap = mUtils.zoomBitmap(bitmap, 70, 70);
+						image3.setImageBitmap(bitmap);
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+				} else {
+					Resources res = getResources();
+					Bitmap bmp = BitmapFactory.decodeResource(res,
+							R.drawable.noperson);
+					image3.setImageBitmap(bmp);
+				}
+
+			} else if (requestCode == 1) {
+				if (data == null) {
+					return;
+				}
+				Uri uri = data.getData();
+				ContentResolver cr = this.getContentResolver();
+				String[] proj = { MediaStore.Images.Media.DATA };
+				@SuppressWarnings("deprecation")
+				Cursor cursor = managedQuery(uri, proj, null, null, null);
+				int column_index = cursor
+						.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+				cursor.moveToFirst();
+				String path = cursor.getString(column_index);
+				mImgPaths = path;
+				// 对图片进行旋转处理
+				bitmap = mUtils.PhotoRotation(uri);
+				bitmap = mUtils.zoomBitmap(bitmap, 70, 70);
+				/* 将Bitmap设定到ImageView */
+				image3.setImageBitmap(bitmap);
+			}
+		}
+	}
+
+	protected Dialog onCreateDialog(int id) {
+		AlertDialog dialog = null;
+		AlertDialog.Builder builder = null;
+		switch (id) {
+		case 0:
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("添加用户图片");
+			builder.setItems(addPhoto, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					if (which == 0) {
+						String haveSD = Environment.getExternalStorageState();
+						if (!haveSD.equals(Environment.MEDIA_MOUNTED)) {
+							CommonUtils.ShowToastCenter(RegeditActivity.this,
+									"存储卡不可用", Toast.LENGTH_LONG);
+							return;
+						}
+						File dir = new File(Environment
+								.getExternalStorageDirectory()
+								+ "/"
+								+ "carPhoto");
+						if (!dir.exists()) {
+							dir.mkdirs();
+						} else {// 如果已经存在了该文件夹
+								// 判断该文件夹中是否存在Car.jpg文件,如果存在则删除
+							String strPhotoPath = Environment
+									.getExternalStorageDirectory()
+									+ "/"
+									+ "carPhoto" + "/" + "Car.jpg";
+							File pPhotoFile = new File(strPhotoPath);
+							if (pPhotoFile.exists()) {
+								pPhotoFile.delete();
+							}
+						}
+						Intent intent = new Intent(
+								android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+						File imgFile = new File(dir, "Car.jpg");
+						Uri u = Uri.fromFile(imgFile);
+						intent.putExtra(MediaStore.Images.Media.ORIENTATION, 0);
+						intent.putExtra(MediaStore.EXTRA_OUTPUT, u);
+						startActivityForResult(intent, 0);
+					}
+					if (which == 1) {
+						Intent intent = new Intent(
+								"android.intent.action.GET_CONTENT");
+						intent.addCategory("android.intent.category.OPENABLE");
+						intent.setType("image/*");
+						RegeditActivity.this.startActivityForResult(intent, 1);
+					}
+				}
+			});
+			dialog = builder.create();
+			break;
+
+		default:
+			break;
+		}
+		return dialog;
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (m_ProgressDialog != null) {
+			m_ProgressDialog.dismiss();
+			m_ProgressDialog = null;
+		}
+		finish();
+	}
+}

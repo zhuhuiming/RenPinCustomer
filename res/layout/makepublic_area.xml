@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+       
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#F5F5F5"
+        android:orientation="horizontal" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/makepublicarea"
+                android:textSize="18sp" />
+        </RelativeLayout>  
+          </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1e90ff"
+        android:orientation="horizontal" >
+    </LinearLayout>
+    
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+           
+            android:orientation="vertical" >
+   <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp" >
+        
+            <RadioButton
+            
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            
+            android:text="@string/makepublicarea_local" />
+             <TextView
+                
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:text="任务只有附近的人能看到"
+                android:textSize="13sp" />
+                 </LinearLayout>
+             <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp" >
+            <RadioButton
+            
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+           
+            android:text="@string/makepublicarea_choose" />
+              <EditText
+                
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:hint="请输入地址，如：浦东正大广场"
+                android:textSize="13sp" />
+            
+              </LinearLayout>
+            
+        <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp" >     
+            <RadioButton
+           
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/makepublicarea_none" />
+            <TextView
+                
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:text="任务能被所有人看到"
+                android:textSize="13sp" />
+            
+   </LinearLayout>
+            
+            
+        </LinearLayout>
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#1e90ff"
+        android:orientation="horizontal" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <Button
+           
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:background="@drawable/frame_grey"
+            android:text="@string/confirm"
+            android:textColor="@color/blue" />
+
+        <Button
+
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/frame_grey"
+            android:text="@string/cancle"
+            android:textColor="@color/blue" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,370 @@
+package com.renpin.qq;
+
+import java.io.File;
+import java.io.IOException;
+
+import com.renpin.location.MyApplication;
+import com.renpin.renpincustomer.DynamicDetailActivity;
+import com.renpin.renpincustomer.R;
+import com.renpin.renpincustomer.ShareDynamicDetailActivity;
+import com.renpin.utils.CommonUtils;
+import com.renpin.utils.Util;
+import com.tencent.connect.share.QQShare;
+import com.tencent.mm.sdk.openapi.IWXAPI;
+import com.tencent.mm.sdk.openapi.SendMessageToWX;
+import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import com.tencent.mm.sdk.openapi.WXImageObject;
+import com.tencent.mm.sdk.openapi.WXMediaMessage;
+import com.tencent.mm.sdk.openapi.WXWebpageObject;
+import com.tencent.tauth.IUiListener;
+import com.tencent.tauth.Tencent;
+import com.tencent.tauth.UiError;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.Toast;
+
+public class BaseActivity extends Activity {
+	// 关于QQ
+	private static final String APP_ID_QQ = "101113055";
+	protected Tencent mTencent = null;
+
+	// 关于微信
+	private static final int THUMB_SIZE = 150;
+	// 微信appId
+	public static final String APP_ID = "wxb18a94b33dc31d25";
+	// 分享到朋友圈需要的版本
+	private static final int TIMELINE_SUPPORTED_VERSION = 0x21020001;
+	private static final int DETAILMAXCHANUM = 20;
+	// IWXAPI 是第三方app和微信通信的openapi接口
+	private IWXAPI api = null;
+
+	// 公共的
+	private static Context mContext = null;
+	// 类型,1表示求助,2表示分享
+	private static int mnType = 0;
+	// 保存标题图片的文件名称
+	private static final String strTitleImageName = "ShareTitleName.png";
+	// 标题图片
+	private static Bitmap titlebmp = null;
+
+	// 控件
+	Button smsbutton;//通过短信分享
+	Button qqbutton;//通过qq分享
+	Button weixinbutton;//通过微信分享
+	Button weixinfriendbutton;//通过微信朋友圈分享
+
+	public static void SetContextAndType(Context context, int nType) {
+		mContext = context;
+		mnType = nType;
+	}
+
+	// 设置标题图片
+	public static void SetTitleBitmap(Bitmap bmp) {
+		titlebmp = bmp;
+	}
+
+	// 将图片保存到指定目录下,同时返回存储路径
+	public String SaveImageToFilePath(String name) {
+
+		String strPath = "";
+		// 判断是否存在sd卡
+		boolean sdExist = android.os.Environment.MEDIA_MOUNTED
+				.equals(android.os.Environment.getExternalStorageState());
+		if (!sdExist) {// 如果不存在,
+			Log.e("SD卡管理：", "SD卡不存在，请加载SD卡");
+		} else {// 如果存在
+				// 获取sd卡路径
+			strPath = android.os.Environment.getExternalStorageDirectory()
+					.getAbsolutePath();
+			strPath += "/";
+			strPath += MyApplication.downloadDir;// 数据库所在目录
+			String dbPath = strPath + name;// 数据库路径
+			// 判断目录是否存在，不存在则创建该目录
+			File dirFile = new File(strPath);
+			if (!dirFile.exists())
+				dirFile.mkdirs();
+			// 判断文件是否存在，不存在则创建该文件
+			File dbFile = new File(dbPath);
+			if (!dbFile.exists()) {
+				try {
+					dbFile.createNewFile();// 创建文件
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				// isFileCreateSuccess = true;
+				strPath = dbPath;
+			}
+		}
+		return strPath;
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.share_info);
+		// 初始化控件
+		InitActivity();
+	}
+
+	private void InitActivity() {
+		smsbutton = (Button) findViewById(R.id.shareinfo_smsbutton);
+		qqbutton = (Button) findViewById(R.id.shareinfo_qqbutton);
+		weixinbutton = (Button)findViewById(R.id.shareinfo_weixinbutton);
+		weixinfriendbutton = (Button)findViewById(R.id.shareinfo_weixinfriendbutton);
+		
+		smsbutton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				String strText2 = " 详细信息请看http://loveshare.isitestar.cn（大家都在攒人品）";
+				String strText = "";
+				if (1 == mnType) {
+					DynamicDetailActivity activity = (DynamicDetailActivity) mContext;
+					strText = "【帮个忙】";
+					strText += activity.strItemTitleText;
+					strText += "。";
+					// 判断详细信息是否超过了20个字
+					if (activity.strItemDetailText.length() > DETAILMAXCHANUM) {
+						strText += activity.strItemDetailText.substring(0,
+								DETAILMAXCHANUM);
+						strText += "...";
+					} else {
+						strText += activity.strItemDetailText;
+					}
+				} else if (2 == mnType) {
+					ShareDynamicDetailActivity activity = (ShareDynamicDetailActivity) mContext;
+					strText = "【免费分享】";
+					strText += activity.strItemTitleText;
+					strText += "。";
+					// 判断详细信息是否超过了20个字
+					if (activity.strItemDetailText.length() > DETAILMAXCHANUM) {
+						strText += activity.strItemDetailText.substring(0,
+								DETAILMAXCHANUM);
+						strText += "...";
+					} else {
+						strText += activity.strItemDetailText;
+					}
+				}
+				strText += strText2;
+				Uri smsToUri = Uri.parse("smsto:");
+
+				Intent intent = new Intent(Intent.ACTION_SENDTO, smsToUri);
+
+				intent.putExtra("sms_body", strText);
+
+				startActivity(intent);
+			}
+
+		});
+
+		qqbutton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Share();
+			}
+
+		});
+		
+		weixinbutton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				
+				InitWeiXin();
+				String strTitle = "";
+				String strDetailText = "";
+				if (1 == mnType) {
+					DynamicDetailActivity activity = (DynamicDetailActivity) mContext;
+					strTitle = "【帮个忙】" + activity.strItemTitleText;
+					strDetailText = activity.strItemDetailText;
+				} else if (2 == mnType) {
+					ShareDynamicDetailActivity activity = (ShareDynamicDetailActivity) mContext;
+					strTitle = "【免费分享】" + activity.strItemTitleText;
+					strDetailText = activity.strItemDetailText;
+				}
+				// 获取当前屏幕图片
+				Bitmap bmp = titlebmp;
+				if(null == bmp && 1 == mnType){
+					bmp = BitmapFactory.decodeResource(getResources(),
+							R.drawable.qiuzhu);	
+				}else if(null == bmp && 2 == mnType){
+					bmp = BitmapFactory.decodeResource(getResources(),
+							R.drawable.fuli);
+				}
+				WXWebpageObject webpage = new WXWebpageObject();
+				webpage.webpageUrl = CommonUtils.strYinYongBaoUrl;//CommonUtils.strUrl;
+				WXMediaMessage msg = new WXMediaMessage(webpage);
+				msg.title = strTitle;
+				msg.description = strDetailText;
+				msg.thumbData = Util.bmpToByteArray(bmp, true);
+				
+				SendMessageToWX.Req req = new SendMessageToWX.Req();
+				req.transaction = buildTransaction("webpage");
+				req.message = msg;
+				req.scene = SendMessageToWX.Req.WXSceneSession;
+				boolean b = api.sendReq(req);
+				if(!b){
+					CommonUtils.ShowToastCenter(BaseActivity.this, "分享失败,可能是您手机没有安装微信", Toast.LENGTH_LONG);
+				}
+				BaseActivity.this.finish();
+			}			
+		});
+		
+		weixinfriendbutton.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				InitWeiXin();
+				
+				String strTitle = "";
+				String strDetailText = "";
+				if (1 == mnType) {
+					DynamicDetailActivity activity = (DynamicDetailActivity) mContext;
+					strTitle = "【帮个忙】" + activity.strItemTitleText;
+					strDetailText = activity.strItemDetailText;
+				} else if (2 == mnType) {
+					ShareDynamicDetailActivity activity = (ShareDynamicDetailActivity) mContext;
+					strTitle = "【免费分享】" + activity.strItemTitleText;
+					strDetailText = activity.strItemDetailText;
+				}
+				//判断是否支持发送到朋友圈
+				int wxSdkVersion = api.getWXAppSupportAPI();
+				if (wxSdkVersion >= TIMELINE_SUPPORTED_VERSION) {
+					
+					Bitmap bmp = titlebmp;
+					if(null == bmp && 1 == mnType){
+						bmp = BitmapFactory.decodeResource(getResources(),
+								R.drawable.qiuzhu);	
+					}else if(null == bmp && 2 == mnType){
+						bmp = BitmapFactory.decodeResource(getResources(),
+								R.drawable.fuli);
+					}
+					WXWebpageObject webpage = new WXWebpageObject();
+					webpage.webpageUrl = CommonUtils.strYinYongBaoUrl;//CommonUtils.strUrl;
+					WXMediaMessage msg = new WXMediaMessage(webpage);
+					msg.title = strTitle;
+					msg.description = strDetailText;
+					//Bitmap thumb = BitmapFactory.decodeResource(getResources(), R.drawable.send_music_thumb);
+					msg.thumbData = Util.bmpToByteArray(bmp, true);
+					
+					SendMessageToWX.Req req = new SendMessageToWX.Req();
+					req.transaction = buildTransaction("webpage");
+					req.message = msg;
+					req.scene = SendMessageToWX.Req.WXSceneTimeline;
+					boolean b = api.sendReq(req);
+					if(!b){
+						CommonUtils.ShowToastCenter(BaseActivity.this, "分享失败,可能是您手机没有安装微信", Toast.LENGTH_LONG);
+					}
+					BaseActivity.this.finish();
+				} else {
+					CommonUtils.ShowToastCenter(BaseActivity.this, "您当前的微信版本不支持朋友圈分享，微信4.2以上才支持", 
+							Toast.LENGTH_LONG);
+				}
+			}			
+		});
+	}
+
+	//微信初始化
+	private void InitWeiXin(){
+		if(null == api){
+			// 微信初始化
+			api = WXAPIFactory.createWXAPI(this, APP_ID, true);
+		}
+	}
+	
+	// QQ初始化
+	private void InitTencent() {
+		mTencent = Tencent.createInstance(APP_ID_QQ,
+		this.getApplicationContext());
+	}
+
+	public void Share() {
+		if (null == mTencent) {
+			InitTencent();
+		}
+		String strTitle = "";
+		String strDetailText = "";
+		if (1 == mnType) {
+			DynamicDetailActivity activity = (DynamicDetailActivity) mContext;
+			strTitle = "【帮个忙】" + activity.strItemTitleText;
+			strDetailText = activity.strItemDetailText;
+		} else if (2 == mnType) {
+			ShareDynamicDetailActivity activity = (ShareDynamicDetailActivity) mContext;
+			strTitle = "【免费分享】" + activity.strItemTitleText;
+			strDetailText = activity.strItemDetailText;
+		}
+		// 创建标题图片文件
+		String ImageUrl = SaveImageToFilePath(strTitleImageName);
+		if (!ImageUrl.equals("")) {
+			// 将用户头像图片保存到该文件中
+			CommonUtils util = new CommonUtils(this);
+			try {
+				if (titlebmp != null) {
+					util.saveBitmapToFile(titlebmp, ImageUrl);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		// 点击该分享跳转到的网页地址
+		String TargeUrl = CommonUtils.strUrl;
+		String App_Source = "攒人品";
+
+		Bundle params = new Bundle();
+		params.putString(QQShare.SHARE_TO_QQ_TITLE, strTitle);
+		params.putString(QQShare.SHARE_TO_QQ_TARGET_URL, TargeUrl);
+		params.putString(QQShare.SHARE_TO_QQ_SUMMARY, strDetailText);
+		params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, ImageUrl);
+		params.putString(QQShare.SHARE_TO_QQ_APP_NAME, App_Source);
+      
+		mTencent.shareToQQ(this, params, new IUiListener() {
+
+			@Override
+			public void onCancel() {
+				showMessage("分享取消");
+			}
+
+			@Override
+			public void onComplete(Object arg0) {
+				showMessage("分享成功:" + arg0.toString());
+			}
+
+			@Override
+			public void onError(UiError arg0) {
+				showMessage("分享失败:" + arg0.errorMessage);
+			}
+
+		});
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (mTencent != null) {
+			mTencent.onActivityResult(requestCode, resultCode, data);
+		}
+	}
+
+	public void showMessage(String msg) {
+		CommonUtils.ShowToastCenter(this, msg, Toast.LENGTH_LONG);
+	}
+	
+	private String buildTransaction(final String type) {
+		return (type == null) ? String.valueOf(System.currentTimeMillis())
+				: type + System.currentTimeMillis();
+	}
+}
